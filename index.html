@@ -3,408 +3,584 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D擬真簡報與圖表風格生成引擎</title>
+    <title>3D 擬真簡報與圖表風格生成引擎</title>
     <style>
-        /* 網頁全體視覺設計：高科技暗黑風格 */
-        body {
-            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-            background-color: #060B1A;
-            color: #F5F7FA;
-            margin: 0;
-            padding: 20px;
-        }
-        h1, h3 {
-            color: #00E5FF;
-            text-align: center;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background-color: #0E1832;
-            padding: 30px;
-            border-radius: 10px;
-            border: 1px solid #1E3A8A;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #78909C;
-            font-weight: bold;
-        }
-        /* 單行輸入框與下拉選單樣式 */
-        input[type="text"], select {
-            width: 100%;
-            padding: 10px;
-            background-color: #060B1A;
-            border: 1px solid #1E3A8A;
-            color: #F5F7FA;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 15px;
-            transition: border-color 0.3s;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #00E5FF;
+        /* ====== 設計令牌 ====== */
+        :root {
+            --bg-deep:      #060B1A;
+            --bg-card:      #0E1832;
+            --bg-input:     #060B1A;
+            --border:       #1E3A8A;
+            --border-focus: #00E5FF;
+            --accent:       #00E5FF;
+            --accent2:      #2979FF;
+            --danger:       #FF3D00;
+            --success:      #00E676;
+            --text:         #F5F7FA;
+            --text-dim:     #78909C;
+            --text-pill:    #79C2E7;
+            --radius:       8px;
+            --radius-lg:    12px;
+            --shadow:       0 12px 32px rgba(0,0,0,0.6);
+            --glow:         0 0 12px rgba(0,229,255,0.3);
+            --transition:   0.22s ease;
         }
 
-        /* 專屬：全高數字微調控制器樣式 */
-        .number-control {
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            padding: 24px 16px 60px;
+            min-height: 100vh;
+        }
+
+        /* ── 頁首 ── */
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .page-header h1 {
+            color: var(--accent);
+            font-size: clamp(18px, 2.6vw, 26px);
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 20px rgba(0,229,255,0.4);
+        }
+        .page-header .sub {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(0,229,255,0.08);
+            border: 1px solid rgba(0,229,255,0.25);
+            color: var(--accent);
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 8px;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── 容器 ── */
+        .container {
+            max-width: 1160px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            padding: 32px 36px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow), inset 0 1px 1px rgba(255,255,255,0.04);
+        }
+
+        /* ── 分區標題 ── */
+        .section-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text-dim);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        .section-title span { color: var(--accent); }
+
+        /* ── 分隔線 ── */
+        hr.divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 28px 0;
+        }
+
+        /* ── 網格 ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+        /* ── 表單群組 ── */
+        .form-group { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .label-sub {
+            font-size: 11px;
+            font-weight: normal;
+            color: var(--text-dim);
+            margin-left: 4px;
+        }
+
+        /* ── 輸入元件 ── */
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 13px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: var(--glow);
+        }
+        input[readonly] { color: var(--text-dim); cursor: default; }
+        textarea { resize: vertical; line-height: 1.6; }
+        select { cursor: pointer; }
+
+        /* ── 步進器 ── */
+        .stepper-wrap { display: flex; align-items: center; gap: 10px; }
+        .stepper {
             display: flex;
-            align-items: stretch;
-            background-color: #060B1A;
-            border: 1px solid #1E3A8A;
-            border-radius: 5px;
-            height: 41px; /* 統一匹配一般欄位的高度 */
-            box-sizing: border-box;
-            transition: border-color 0.3s;
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             overflow: hidden;
+            height: 42px;
+            background: var(--bg-input);
+            transition: border-color var(--transition);
         }
-        .number-control:focus-within {
-            border-color: #00E5FF;
+        .stepper:focus-within { border-color: var(--border-focus); box-shadow: var(--glow); }
+        .stepper input[type="number"] {
+            border: none;
+            border-radius: 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent);
+            background: transparent;
+            padding: 0;
         }
-        .number-control button {
-            background-color: #1E3A8A;
-            color: #F5F7FA;
+        .stepper input::-webkit-inner-spin-button,
+        .stepper input::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .stepper input { -moz-appearance: textfield; }
+        .stepper input:focus { outline: none; box-shadow: none; }
+        .step-btn {
+            background: #152040;
+            color: var(--text);
             border: none;
             width: 40px;
-            cursor: pointer;
             font-size: 18px;
-            font-weight: bold;
-            transition: 0.2s;
+            cursor: pointer;
+            transition: background var(--transition), color var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             user-select: none;
+            flex-shrink: 0;
         }
-        .number-control button:hover {
-            background-color: #00E5FF;
-            color: #060B1A;
-        }
-        .number-control input {
-            flex: 1;
-            width: 100%;
-            min-width: 0;
-            background: transparent;
-            border: none;
-            color: #F5F7FA;
-            text-align: center;
-            font-size: 15px;
-            padding: 0;
-            outline: none;
-            -moz-appearance: textfield; /* 隱藏 Firefox 原生按鈕 */
-        }
-        .number-control input::-webkit-outer-spin-button,
-        .number-control input::-webkit-inner-spin-button {
-            -webkit-appearance: none; /* 隱藏 Chrome/Safari 原生按鈕 */
-            margin: 0;
-        }
-        .number-control .num-unit {
+        .step-btn:hover { background: var(--accent); color: var(--bg-deep); }
+        .stepper-unit { color: var(--text-dim); font-size: 13px; white-space: nowrap; font-weight: bold; }
+
+        /* ── 自訂選單（格狀） ── */
+        .custom-select { position: relative; width: 100%; }
+        .select-box {
+            padding: 10px 13px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: var(--radius);
+            cursor: pointer;
+            user-select: none;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            padding-right: 15px;
-            color: #78909C;
-            font-size: 14px;
-            user-select: none;
+            justify-content: space-between;
+            transition: border-color var(--transition);
         }
-
-        /* 多行輸入框 (textarea) 的專屬樣式 */
-        .form-textarea {
-            width: 100%;
-            padding: 10px;
-            background-color: #060B1A;
-            border: 1px solid #1E3A8A;
-            color: #F5F7FA;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 15px;
-            transition: border-color 0.3s;
-            resize: vertical;
-            line-height: 1.5;
+        .select-box::after {
+            content: "▾";
+            color: var(--text-dim);
+            font-size: 12px;
+            transition: transform var(--transition);
+            flex-shrink: 0;
+            margin-left: 8px;
         }
-        .form-textarea:focus {
-            outline: none;
-            border-color: #00E5FF;
-        }
-        select {
-            cursor: pointer;
-            appearance: auto;
-        }
-        .custom-select {
-            position: relative;
-            width: 100%;
-        }
-        .select-box {
-            padding: 10px;
-            background-color: #060B1A;
-            border: 1px solid #1E3A8A;
-            color: #F5F7FA;
-            border-radius: 5px;
-            cursor: pointer;
-            user-select: none;
-        }
+        .select-box.open { border-color: var(--border-focus); box-shadow: var(--glow); }
+        .select-box.open::after { transform: rotate(180deg); }
         .options-grid {
             display: none;
             position: absolute;
-            top: 100%;
+            top: calc(100% + 4px);
             left: 0;
             width: 100%;
-            background-color: #0E1832;
-            border: 1px solid #00E5FF;
-            border-radius: 5px;
-            z-index: 100;
+            background: #0A1428;
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            z-index: 200;
             padding: 10px;
-            box-sizing: border-box;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
-            grid-template-columns: repeat(3, 1fr);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.85);
+            grid-template-columns: repeat(5, 1fr);
             gap: 5px;
-            max-height: 300px;
+            max-height: 260px;
             overflow-y: auto;
         }
-        .options-grid.show {
-            display: grid;
-        }
+        .options-grid.show { display: grid; }
+        .options-grid::-webkit-scrollbar { width: 5px; }
+        .options-grid::-webkit-scrollbar-track { background: transparent; }
+        .options-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
         .option-item {
-            padding: 8px;
+            padding: 7px 4px;
             text-align: center;
-            background-color: #1E3A8A;
-            color: #F5F7FA;
-            border-radius: 3px;
+            background: #152040;
+            color: var(--text);
+            border-radius: 5px;
             cursor: pointer;
-            transition: 0.2s;
-            font-size: 14px;
+            transition: background var(--transition), color var(--transition);
+            font-size: 12.5px;
+            line-height: 1.3;
         }
-        .option-item:hover {
-            background-color: #00E5FF;
-            color: #060B1A;
+        .option-item:hover { background: var(--accent); color: var(--bg-deep); font-weight: bold; }
+        .option-item.selected { background: rgba(0,229,255,0.15); border: 1px solid var(--accent); color: var(--accent); }
+
+        /* ── 色調預覽 ── */
+        .color-preview-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0A1428;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 14px 20px;
+            margin-bottom: 22px;
+        }
+        .color-preview-label { font-size: 14px; color: var(--text); white-space: nowrap; }
+        .color-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #152238;
+            border: 1px solid #28547C;
+            border-radius: 50px;
+            padding: 8px 20px 8px 12px;
+        }
+        .color-dot {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: background-color 0.4s, box-shadow 0.4s;
+        }
+        .color-name {
+            color: var(--text-pill);
+            font-size: 15px;
             font-weight: bold;
+            letter-spacing: 1px;
+            transition: color 0.3s;
         }
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        .color-hex-badge {
+            margin-left: auto;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            color: var(--text-dim);
+            background: rgba(0,0,0,0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 1px;
         }
 
-        /* 統一使用的雙欄排版容器，自動折行形成 2x2 佈局 */
-        .grid-2-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        /* ── 風格組合預覽 ── */
+        .style-preview {
+            background: rgba(0,229,255,0.04);
+            border: 1px dashed rgba(0,229,255,0.2);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .style-preview .label { color: var(--text-dim); font-size: 12px; white-space: nowrap; }
+        .style-preview .value {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 14px;
+            letter-spacing: 0.5px;
         }
 
+        /* ── 生成按鈕 ── */
         .btn-generate {
             width: 100%;
-            padding: 15px;
-            background-color: #00E5FF;
-            color: #060B1A;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            color: var(--bg-deep);
             border: none;
-            border-radius: 5px;
+            border-radius: var(--radius);
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 20px;
-            transition: 0.3s;
+            transition: transform var(--transition), box-shadow var(--transition);
+            letter-spacing: 2px;
         }
-        .btn-generate:hover {
-            background-color: #2979FF;
-            color: #FFF;
+        .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,229,255,0.4); }
+        .btn-generate:active { transform: translateY(0); }
+
+        /* ── 輸出區 ── */
+        .output-section { margin-top: 32px; display: flex; flex-direction: column; gap: 20px; }
+        .output-card {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
         }
-        .output-group {
-            margin-top: 30px;
-            background-color: #060B1A;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #1E3A8A;
-        }
-        .output-header {
+        .output-toolbar {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            justify-content: space-between;
+            background: #0A1020;
+            padding: 11px 18px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .output-header h3 {
-            margin: 0;
-            color: #00E5FF;
-            font-size: 18px;
+        .output-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .copy-btn {
-            padding: 8px 16px;
-            background-color: #2979FF;
-            color: #FFF;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
+        .dot-row { display: flex; gap: 6px; }
+        .dot { width: 11px; height: 11px; border-radius: 50%; }
+        .output-title {
+            font-size: 13px;
+            color: var(--accent);
             font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+            letter-spacing: 0.5px;
         }
-        .copy-btn:hover {
-            background-color: #00E5FF;
-            color: #060B1A;
-        }
-        .output-group textarea {
+        .output-toolbar-right { display: flex; align-items: center; gap: 8px; }
+        .char-count { font-size: 12px; color: var(--text-dim); }
+
+        .output-textarea {
             width: 100%;
-            height: 400px;
-            background-color: #000;
+            height: 380px;
+            background: #020408;
             color: #00E676;
-            border: 1px solid #1E3A8A;
-            border-radius: 5px;
-            padding: 15px;
-            box-sizing: border-box;
-            font-family: 'Courier New', Courier, monospace;
+            border: none;
+            padding: 18px 20px;
+            font-family: 'Consolas', 'Cascadia Code', 'Courier New', monospace;
+            font-size: 13.5px;
+            line-height: 1.65;
             resize: vertical;
         }
-        
-        /* 專屬色彩預覽區塊 */
-        .theme-color-display {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-            font-size: 20px;
-            color: #F5F7FA;
-            letter-spacing: 1px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        }
-        .theme-color-pill {
-            display: flex;
-            align-items: center;
-            background-color: #152238; 
-            border: 1px solid #28547C; 
-            border-radius: 50px;
-            padding: 8px 22px 8px 14px;
-            margin-left: 10px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .theme-color-circle {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            margin-right: 12px;
-            transition: all 0.3s ease;
-        }
-        .theme-color-text {
-            color: #79C2E7; 
-            font-size: 18px;
+        .output-textarea:focus { outline: none; }
+        .output-textarea::-webkit-scrollbar { width: 6px; }
+        .output-textarea::-webkit-scrollbar-track { background: transparent; }
+        .output-textarea::-webkit-scrollbar-thumb { background: #1E3A8A; border-radius: 3px; }
+
+        /* ── 功能按鈕 ── */
+        .btn {
+            padding: 7px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: bold;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: #152040;
+            color: var(--text);
+            font-family: inherit;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); }
+        .btn.copy { background: var(--success); border-color: var(--success); color: #000; }
+        .btn.copy:hover { background: #33EE88; }
+        .btn.copy.done { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+        .btn.dl { background: #152040; }
+
+        /* ── 提示條 ── */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0E1832;
+            border: 1px solid var(--accent);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.err { border-color: var(--danger); color: #FF8A80; }
+
+        /* ── 進度條 ── */
+        @keyframes sweep { 0%{left:-40%;width:40%} 100%{left:100%;width:40%} }
+        .progress-bar {
+            height: 3px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 2px;
+            display: none;
+        }
+        .progress-bar.active { display: block; }
+        .progress-indicator {
+            position: relative;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: sweep 1.1s ease-in-out infinite;
+        }
+
+        /* ── RWD ── */
+        @media (max-width: 900px) {
+            .container { padding: 24px 20px; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .grid-3 { grid-template-columns: 1fr 1fr; }
+            .options-grid { grid-template-columns: repeat(4,1fr); }
+        }
+        @media (max-width: 600px) {
+            .container { padding: 18px 14px; }
+            .grid-3 { grid-template-columns: 1fr 1fr; }
+            .options-grid { grid-template-columns: repeat(3,1fr); }
+            .output-toolbar { flex-direction: column; align-items: flex-start; }
+        }
+        @media (max-width: 400px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
+<!-- Toast 提示 -->
+<div class="toast" id="toast"></div>
+
+<div class="page-header">
+    <h1>3D 擬真簡報與圖表風格生成引擎 <span class="badge">v2.0</span></h1>
+    <div class="sub">組合風格模組 → 填寫資訊 → 一鍵生成三份 YAML 指令檔</div>
+</div>
+
 <div class="container">
-    <h1>3D擬真簡報與圖表風格生成引擎</h1>
-    
-    <div class="grid-container">
+
+    <!-- ══ 區塊一：風格模組 ══ -->
+    <div class="section-title"><span>01</span> &nbsp;風格模組組合</div>
+    <div class="grid-2">
+
+        <!-- 左：簡報風格 -->
         <div>
-            <h3 style="text-align: left;">【簡報風格模組組合】</h3>
             <div class="form-group">
-                <label>風格基底 (固定)</label>
-                <input type="text" value="3D擬真 + 主題物件連動" readonly style="color:#78909C;">
+                <label>風格基底 <span class="label-sub">(固定)</span></label>
+                <input type="text" value="3D 擬真 + 主題物件連動" readonly>
             </div>
             <div class="form-group">
-                <label>形容詞模組 (可不選 / 30種)</label>
+                <label>形容詞模組 <span class="label-sub">(可不選 / 30 種)</span></label>
                 <div class="custom-select" id="select-adj">
-                    <div class="select-box">無 (點擊展開選擇)</div>
+                    <div class="select-box" data-placeholder="無（點擊展開選擇）">無（點擊展開）</div>
                     <div class="options-grid"></div>
                     <input type="hidden" id="val-adj" value="">
                 </div>
             </div>
             <div class="form-group">
-                <label>色調模組 (可不選 / 30種)</label>
+                <label>色調模組 <span class="label-sub">(可不選 / 30 種)</span></label>
                 <div class="custom-select" id="select-color">
-                    <div class="select-box">無 (點擊展開選擇)</div>
+                    <div class="select-box" data-placeholder="無（點擊展開選擇）">無（點擊展開）</div>
                     <div class="options-grid"></div>
                     <input type="hidden" id="val-color" value="">
                 </div>
             </div>
             <div class="form-group">
-                <label>名詞模組 (必選 / 30種)</label>
+                <label>名詞模組 <span class="label-sub">(必選 / 30 種)</span></label>
                 <div class="custom-select" id="select-noun">
-                    <div class="select-box">點擊展開選擇</div>
+                    <div class="select-box">核心（點擊展開）</div>
                     <div class="options-grid"></div>
                     <input type="hidden" id="val-noun" value="核心">
                 </div>
             </div>
         </div>
 
+        <!-- 右：圖表設定 -->
         <div>
-            <h3 style="text-align: left;">【圖表設定與版面配置】</h3>
             <div class="form-group">
-                <label>圖表需求類型 (30種)</label>
+                <label>圖表需求類型 <span class="label-sub">(30 種)</span></label>
                 <div class="custom-select" id="select-type">
-                    <div class="select-box">點擊展開選擇</div>
+                    <div class="select-box">數據分析（點擊展開）</div>
                     <div class="options-grid"></div>
                     <input type="hidden" id="val-type" value="數據分析">
                 </div>
             </div>
             <div class="form-group">
-                <label>圖表風格 (30種)</label>
+                <label>圖表視覺風格 <span class="label-sub">(30 種)</span></label>
                 <div class="custom-select" id="select-chart-style">
-                    <div class="select-box">點擊展開選擇</div>
+                    <div class="select-box">玻璃擬真（點擊展開）</div>
                     <div class="options-grid"></div>
                     <input type="hidden" id="val-chart-style" value="玻璃擬真">
                 </div>
             </div>
             <div class="form-group">
-                <label>畫面佈局 (30種)</label>
+                <label>畫面佈局 <span class="label-sub">(30 種)</span></label>
                 <div class="custom-select" id="select-layout">
-                    <div class="select-box">點擊展開選擇</div>
+                    <div class="select-box">網格陣列（點擊展開）</div>
                     <div class="options-grid"></div>
                     <input type="hidden" id="val-layout" value="網格陣列">
                 </div>
             </div>
-            
             <div class="form-group">
-                <label>圖表補充需求 (選填，可多行輸入)</label>
-                <textarea id="chart-extra" class="form-textarea" rows="3" placeholder="若有圖表特定的數據重點、風格避諱或版面要求，請填寫於此..."></textarea>
+                <label>圖表補充需求 <span class="label-sub">(選填)</span></label>
+                <textarea id="chart-extra" rows="3" placeholder="數據重點、風格避諱或版面要求..."></textarea>
             </div>
         </div>
     </div>
 
-    <hr style="border-color: #1E3A8A; margin: 30px 0;">
+    <!-- 風格組合即時預覽 -->
+    <div class="style-preview" id="style-preview-bar">
+        <span class="label">目前風格組合：</span>
+        <span class="value" id="style-preview-text">3D 擬真核心</span>
+    </div>
 
-    <div class="grid-container">
+    <hr class="divider">
+
+    <!-- ══ 區塊二：基本資訊 ══ -->
+    <div class="section-title"><span>02</span> &nbsp;團隊基本資訊</div>
+
+    <!-- 色調預覽 -->
+    <div class="color-preview-bar">
+        <span class="color-preview-label">主題專屬 3D 色調：</span>
+        <div class="color-pill">
+            <div class="color-dot" id="color-dot"></div>
+            <span class="color-name" id="color-name">等待演算...</span>
+        </div>
+        <span class="color-hex-badge" id="color-hex-badge">#------</span>
+    </div>
+
+    <input type="hidden" id="val-theme-color-name" value="">
+    <input type="hidden" id="val-theme-color-hex"  value="">
+
+    <div class="grid-2">
         <div>
-            <h3 style="text-align: left; color:#78909C;">【團隊基本資訊】</h3>
-            
-            <div class="theme-color-display">
-                <span>主題專屬 3D 色調：</span>
-                <div class="theme-color-pill">
-                    <div class="theme-color-circle" id="preview-color-box"></div>
-                    <span class="theme-color-text" id="preview-color-text">等待演算...</span>
-                </div>
-            </div>
-            
-            <input type="hidden" id="val-theme-color-name" value="">
-            <input type="hidden" id="val-theme-color-hex" value="">
-
             <div class="form-group">
-                <label>簡報要報告的題目 (輸入時自動演算專屬色調)</label>
-                <input type="text" id="report-title" value="智慧科技導入與營運策略報告" oninput="updateColorPreviewFromTitle()">
+                <label>簡報主題 <span class="label-sub">(輸入時自動演算色調)</span></label>
+                <input type="text" id="report-title" value="智慧科技導入與營運策略報告" oninput="onTitleInput()">
             </div>
-            
-            <div class="grid-2-col">
-                <div class="form-group">
-                    <label>次標題 (學校/系級)</label>
-                    <input type="text" id="report-subtitle" value="健行科技大學 進二技 工管三甲">
-                </div>
-                <div class="form-group">
-                    <label>報告人 (組別)</label>
-                    <input type="text" id="report-group" value="第六小組">
-                </div>
-            </div>
-
             <div class="form-group">
-                <label>小組成員 (可按 Enter 多行輸入)</label>
-                <textarea id="report-members" class="form-textarea" rows="4">楊啟正 C11431109
+                <label>次標題 <span class="label-sub">(學校 / 系級)</span></label>
+                <input type="text" id="report-subtitle" value="健行科技大學 進二技 工管三甲">
+            </div>
+            <div class="form-group">
+                <label>報告人 <span class="label-sub">(組別)</span></label>
+                <input type="text" id="report-group" value="第六小組">
+            </div>
+            <div class="form-group">
+                <label>小組成員 <span class="label-sub">(每行一人，自動轉換格式)</span></label>
+                <textarea id="report-members" rows="5">楊啟正 C11431109
 鍾曉彤 C11431125
 蕭建鳴 C11431105
 蘇萬紘 C11431124
@@ -412,480 +588,593 @@
 詹朝元 C11431143</textarea>
             </div>
         </div>
-        
+
         <div>
-            <h3 style="text-align: left; color:#78909C;">【簡報參數設定】</h3>
-            
-            <div class="grid-2-col">
-                <div class="form-group">
-                    <label>簡報類型</label>
-                    <select id="report-type">
-                        <option value="學術專案報告">學術專案報告</option>
-                        <option value="論文發表" selected>論文發表</option>
-                        <option value="商業提案企劃">商業提案企劃</option>
-                        <option value="期末成果展演">期末成果展演</option>
-                        <option value="產品發表會">產品發表會</option>
-                        <option value="專題研討會">專題研討會</option>
-                        <option value="教育訓練課程">教育訓練課程</option>
-                        <option value="專案進度匯報">專案進度匯報</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>簡報頁數</label>
-                    <div class="number-control">
-                        <button type="button" onclick="adjustNumberValue('report-pages', -1, 1, 1)">-</button>
-                        <input type="number" id="report-pages" value="20" min="1">
-                        <span class="num-unit">頁</span>
-                        <button type="button" onclick="adjustNumberValue('report-pages', 1, 1, 1)">+</button>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>報告時間</label>
-                    <div class="number-control">
-                        <button type="button" onclick="adjustNumberValue('report-time', -1, 5, 5)">-</button>
-                        <input type="number" id="report-time" value="40" min="5" step="5">
-                        <span class="num-unit">分鐘</span>
-                        <button type="button" onclick="adjustNumberValue('report-time', 1, 5, 5)">+</button>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>報告場景</label>
-                    <select id="report-scene">
-                        <option value="小型會議室投影 (標準字級)">小型會議室投影 (標準字級)</option>
-                        <option value="大型會議室投影 (放大字級)" selected>大型會議室投影 (放大字級)</option>
-                        <option value="教室投影 (高對比大字級)">教室投影 (高對比大字級)</option>
-                        <option value="演講廳大螢幕 (超大字級)">演講廳大螢幕 (超大字級)</option>
-                        <option value="線上視訊會議 (螢幕優化)">線上視訊會議 (螢幕優化)</option>
-                    </select>
-                </div>
-            </div>
-            
             <div class="form-group">
-                <label>簡報補充需求 (可隨時修改編輯)</label>
-                <textarea id="report-extra" class="form-textarea" rows="5" placeholder="若有簡報特定的特殊風格、視覺避諱或排版要求，請填寫於此...">學號部分使用英文數字在首頁呈現,小組成員分成2列並排
-不要有英文詞彙,仔細檢查不要有錯字及模糊的字
-一頁一主題,案例說明部分要有案例要因分析,防範措施計畫,對應法規,所有內容均屬事實正確與來源相同不可杜撰</textarea>
+                <label>簡報類型</label>
+                <select id="report-type">
+                    <option value="學術專案報告">學術專案報告</option>
+                    <option value="論文發表" selected>論文發表</option>
+                    <option value="商業提案企劃">商業提案企劃</option>
+                    <option value="期末成果展演">期末成果展演</option>
+                    <option value="產品發表會">產品發表會</option>
+                    <option value="專題研討會">專題研討會</option>
+                    <option value="教育訓練課程">教育訓練課程</option>
+                    <option value="專案進度匯報">專案進度匯報</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>簡報頁數</label>
+                <div class="stepper-wrap">
+                    <div class="stepper">
+                        <button type="button" class="step-btn" onclick="step('report-pages',-5,5)">−</button>
+                        <input type="number" id="report-pages" value="20" min="5" step="5">
+                        <button type="button" class="step-btn" onclick="step('report-pages',5,5)">+</button>
+                    </div>
+                    <span class="stepper-unit">頁</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>報告時間</label>
+                <div class="stepper-wrap">
+                    <div class="stepper">
+                        <button type="button" class="step-btn" onclick="step('report-time',-5,5)">−</button>
+                        <input type="number" id="report-time" value="40" min="5" step="5">
+                        <button type="button" class="step-btn" onclick="step('report-time',5,5)">+</button>
+                    </div>
+                    <span class="stepper-unit">分鐘</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>報告場景</label>
+                <select id="report-scene">
+                    <option value="大型會議室投影（放大字級）" selected>大型會議室投影（放大字級）</option>
+                    <option value="小型會議室投影（標準字級）">小型會議室投影（標準字級）</option>
+                    <option value="教室投影（高對比大字級）">教室投影（高對比大字級）</option>
+                    <option value="演講廳大螢幕（超大字級）">演講廳大螢幕（超大字級）</option>
+                    <option value="線上視訊會議（螢幕優化）">線上視訊會議（螢幕優化）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>簡報補充需求 <span class="label-sub">(選填)</span></label>
+                <textarea id="report-extra" rows="5" placeholder="特殊風格要求、視覺避諱、排版規則...">學號部分使用英文數字在首頁呈現，小組成員分成 2 列並排
+不要有英文詞彙，仔細檢查不要有錯字及模糊的字
+一頁一主題，案例說明部分要有案例要因分析、防範措施計畫、對應法規，所有內容均屬事實正確與來源相同不可杜撰</textarea>
             </div>
         </div>
     </div>
 
-    <button class="btn-generate" onclick="generateYAML()">一鍵生成專屬 YAML 指令檔</button>
+    <!-- 進度條 -->
+    <div class="progress-bar" id="progress-bar"><div class="progress-indicator"></div></div>
 
-    <div class="output-group">
-        <div class="output-header">
-            <h3>產出結果：簡報視覺設定 YAML (格式一)</h3>
-            <button class="copy-btn" onclick="copyText('output-ppt-1', this)">一鍵複製</button>
-        </div>
-        <textarea id="output-ppt-1" readonly placeholder="生成結果將顯示於此..."></textarea>
-    </div>
-    
-    <div class="output-group">
-        <div class="output-header">
-            <h3>產出結果：簡報視覺設定 YAML (格式二)</h3>
-            <button class="copy-btn" onclick="copyText('output-ppt-2', this)">一鍵複製</button>
-        </div>
-        <textarea id="output-ppt-2" readonly placeholder="生成結果將顯示於此..."></textarea>
-    </div>
+    <button class="btn-generate" onclick="generateAll()">
+        ⚡ 一鍵生成三份專屬 YAML 指令檔
+    </button>
 
-    <div class="output-group">
-        <div class="output-header">
-            <h3>產出結果：資訊圖表專用設定 YAML</h3>
-            <button class="copy-btn" onclick="copyText('output-chart', this)">一鍵複製</button>
+    <!-- ══ 輸出區 ══ -->
+    <div class="output-section" id="output-section" style="display:none;">
+
+        <!-- 輸出一：簡報基礎設定 -->
+        <div class="output-card">
+            <div class="output-toolbar">
+                <div class="output-toolbar-left">
+                    <div class="dot-row">
+                        <div class="dot" style="background:#00E676;"></div>
+                        <div class="dot" style="background:#F6E05E;"></div>
+                        <div class="dot" style="background:#E53E3E;"></div>
+                    </div>
+                    <span class="output-title">YAML 格式一：簡報基礎設定</span>
+                </div>
+                <div class="output-toolbar-right">
+                    <span class="char-count" id="count-1"></span>
+                    <button class="btn dl" onclick="downloadOutput('output-1','簡報基礎設定')">↓ 下載</button>
+                    <button class="btn copy" id="copy-btn-1" onclick="copyOutput('output-1','copy-btn-1')">複製全文</button>
+                </div>
+            </div>
+            <textarea class="output-textarea" id="output-1" readonly placeholder="生成結果將顯示於此..."></textarea>
         </div>
-        <textarea id="output-chart" readonly placeholder="生成結果將顯示於此..."></textarea>
-    </div>
-</div>
+
+        <!-- 輸出二：視覺主題設定 -->
+        <div class="output-card">
+            <div class="output-toolbar">
+                <div class="output-toolbar-left">
+                    <div class="dot-row">
+                        <div class="dot" style="background:#00E5FF;"></div>
+                        <div class="dot" style="background:#2979FF;"></div>
+                        <div class="dot" style="background:#7C3AED;"></div>
+                    </div>
+                    <span class="output-title">YAML 格式二：視覺主題完整設定</span>
+                </div>
+                <div class="output-toolbar-right">
+                    <span class="char-count" id="count-2"></span>
+                    <button class="btn dl" onclick="downloadOutput('output-2','視覺主題設定')">↓ 下載</button>
+                    <button class="btn copy" id="copy-btn-2" onclick="copyOutput('output-2','copy-btn-2')">複製全文</button>
+                </div>
+            </div>
+            <textarea class="output-textarea" id="output-2" readonly placeholder="生成結果將顯示於此..."></textarea>
+        </div>
+
+        <!-- 輸出三：資訊圖表設定 -->
+        <div class="output-card">
+            <div class="output-toolbar">
+                <div class="output-toolbar-left">
+                    <div class="dot-row">
+                        <div class="dot" style="background:#FF6B35;"></div>
+                        <div class="dot" style="background:#F59E0B;"></div>
+                        <div class="dot" style="background:#10B981;"></div>
+                    </div>
+                    <span class="output-title">YAML 格式三：資訊圖表專用設定</span>
+                </div>
+                <div class="output-toolbar-right">
+                    <span class="char-count" id="count-3"></span>
+                    <button class="btn dl" onclick="downloadOutput('output-3','資訊圖表設定')">↓ 下載</button>
+                    <button class="btn copy" id="copy-btn-3" onclick="copyOutput('output-3','copy-btn-3')">複製全文</button>
+                </div>
+            </div>
+            <textarea class="output-textarea" id="output-3" readonly placeholder="生成結果將顯示於此..."></textarea>
+        </div>
+
+    </div><!-- /output-section -->
+</div><!-- /container -->
 
 <script>
-    // 數字控制器邏輯
-    function adjustNumberValue(id, delta, step, min) {
-        const input = document.getElementById(id);
-        let val = parseInt(input.value, 10);
-        if (isNaN(val)) val = min;
-        val += delta * step;
-        if (val < min) val = min;
-        input.value = val;
-    }
+/* ════════════════════════════════════
+   資料庫
+════════════════════════════════════ */
+const dataAdj = ["無","智慧","科幻","沉穩","動態","極簡","奢華","賽博","物理","幾何","仿生","虛擬","粒子","全息","脈衝","鏡面","流體","裝甲","晶體","奈米","磁力","量子","重力","光速","星際","折射","霧面","透光","懸浮","聲波","機甲"];
+const dataColor = ["無","科技藍","霓虹紫","熔岩橘","翡翠綠","深空黑","鈦金灰","珍珠白","玫瑰金","香檳黃","琥珀棕","冰川藍","螢光綠","晚霞紅","曜石黑","琉璃青","珊瑚粉","蒼穹藍","莫蘭迪灰","金屬銀","迷幻彩","瑪瑙紅","星塵紫","隕石灰","極光綠","晨曦黃","深海藍","幻影黑","鐳射銀","玫瑰紅","鈷青藍"];
+const dataNoun = ["矩陣","核心","介面","儀表","視界","空間","晶體","節點","模組","系統","中樞","迴路","引擎","面板","終端","網路","伺服","雲端","數據","晶片","陣列","指令","視窗","虛空","屏障","軌道","光柵","質點","頻譜","宇宙"];
+const dataType = ["數據分析","流程圖解","組織架構","時間軸","產品比較","地理分佈","概念解構","趨勢預測","財務報表","風險評估","戰略藍圖","生態系統","效能監控","用戶旅程","資源分配","供應鏈條","生命週期","演算法架構","關聯矩陣","熱力分佈","雷達維度","漏斗轉化","階層拓撲","流向桑基","里程碑","魚骨分析","樹狀節點","散點集群","核心樞紐","儀表總覽"];
+const dataChartStyle = ["玻璃擬真","金屬拉絲","發光全息","黏土立體","壓克力透視","霓虹光管","低多邊形","賽博龐克","工業鑄造","陶瓷溫潤","碳纖維感","光柵折射","水晶剔透","幾何切割","復古雷達","液晶點陣","浮雕刻字","絲絨柔光","冰塊透鏡","液態金屬","星雲粒子","流體漸層","電路板蝕刻","毛玻璃","黑曜石","鈦金屬","全息投影","暗黑螢光","量子糾纏","光影幾何"];
+const dataLayout = ["網格陣列","放射擴散","階梯遞進","自由浮動","聚焦中心","左右對比","螺旋引導","卡片堆疊","上下分層","軌道環繞","黃金比例","蜂巢拼接","瀑布流","交錯拼圖","同心圓環","時間齒輪","對稱鏡像","金字塔","矩陣模塊","星系軌道","立體魔方","多維交疊","漏斗收斂","樹狀分支","波浪起伏","環環相扣","放射射線","錯落鑲嵌","八卦陣列","平行軌道"];
 
-    // 簡報模組資料庫設定 (各30種)
-    const dataAdj = ["無", "智慧", "科幻", "沉穩", "動態", "極簡", "奢華", "賽博", "物理", "幾何", "仿生", "虛擬", "粒子", "全息", "脈衝", "鏡面", "流體", "裝甲", "晶體", "奈米", "磁力", "量子", "重力", "光速", "星際", "折射", "霧面", "透光", "懸浮", "聲波", "機甲"];
-    const dataColor = ["無", "科技藍", "霓虹紫", "熔岩橘", "翡翠綠", "深空黑", "鈦金灰", "珍珠白", "玫瑰金", "香檳黃", "琥珀棕", "冰川藍", "螢光綠", "晚霞紅", "曜石黑", "琉璃青", "珊瑚粉", "蒼穹藍", "莫蘭迪灰", "金屬銀", "迷幻彩", "瑪瑙紅", "星塵紫", "隕石灰", "極光綠", "晨曦黃", "深海藍", "幻影黑", "鐳射銀", "玫瑰紅", "鈷青藍"];
-    const dataNoun = ["矩陣", "核心", "介面", "儀表", "視界", "空間", "晶體", "節點", "模組", "系統", "中樞", "迴路", "引擎", "面板", "終端", "網路", "伺服", "雲端", "數據", "晶片", "陣列", "指令", "視窗", "虛空", "屏障", "軌道", "光柵", "質點", "頻譜", "宇宙"];
-    
-    // 圖表專用資料庫 (各30種)
-    const dataType = [
-        "數據分析", "流程圖解", "組織架構", "時間軸", "產品比較", "地理分佈", "概念解構", "趨勢預測", "財務報表", "風險評估",
-        "戰略藍圖", "生態系統", "效能監控", "用戶旅程", "資源分配", "供應鏈條", "生命週期", "演算法架構", "關聯矩陣", "熱力分佈",
-        "雷達維度", "漏斗轉化", "階層拓撲", "流向桑基", "里程碑", "魚骨分析", "樹狀節點", "散點集群", "核心樞紐", "儀表總覽"
-    ];
-    const dataChartStyle = [
-        "玻璃擬真", "金屬拉絲", "發光全息", "黏土立體", "壓克力透視", "霓虹光管", "低多邊形", "賽博龐克", "工業鑄造", "陶瓷溫潤",
-        "碳纖維感", "光柵折射", "水晶剔透", "幾何切割", "復古雷達", "液晶點陣", "浮雕刻字", "絲絨柔光", "冰塊透鏡", "液態金屬",
-        "星雲粒子", "流體漸層", "電路板蝕刻", "毛玻璃", "黑曜石", "鈦金屬", "全息投影", "暗黑螢光", "量子糾纏", "光影幾何"
-    ];
-    const dataLayout = [
-        "網格陣列", "放射擴散", "階梯遞進", "自由浮動", "聚焦中心", "左右對比", "螺旋引導", "卡片堆疊", "上下分層", "軌道環繞",
-        "黃金比例", "蜂巢拼接", "瀑布流", "交錯拼圖", "同心圓環", "時間齒輪", "對稱鏡像", "金字塔", "矩陣模塊", "星系軌道",
-        "立體魔方", "多維交疊", "漏斗收斂", "樹狀分支", "波浪起伏", "環環相扣", "放射射線", "錯落鑲嵌", "八卦陣列", "平行軌道"
-    ];
+const themeAdjectives = ["量子","賽博","全息","脈衝","奈米","磁暴","虛擬","仿生","矩陣","核心","幾何","光速","粒子","星際","異星","幻影","沉浸","動態","重力","裂變","聚變","躍遷","弦化","晶格","碎星","霓虹","幽能","靈能","超凡","異能"];
+const themeNouns = {
+    red:    ["緋紅","熔岩","丹砂","瑪瑙","烈焰","玫瑰","霞光","血月"],
+    orange: ["琥珀","耀金","流沙","餘暉","焰火","焦糖","橙光","赤金"],
+    yellow: ["熒光","星芒","曜金","暖陽","晨曦","金沙","黃玉","閃電"],
+    green:  ["翠綠","翡翠","極光","幽林","碧石","蒼翠","霓綠","毒石"],
+    cyan:   ["琉璃","冰川","碧波","幻青","蒼穹","霜星","寒冰","水晶"],
+    blue:   ["幽藍","蒼藍","湛藍","深淵","電晶","冰藍","蔚藍","海淵"],
+    purple: ["暮紫","星塵","幽紫","霓紫","幻紫","紫晶","魅影","虛空"],
+    gray:   ["鈦灰","秘銀","曜黑","珍珠","星灰","隕石","幻白","黯影"]
+};
 
-    const themeAdjectives = [
-        "量子", "賽博", "全息", "脈衝", "奈米", "磁暴", "虛擬", "仿生", "矩陣", "核心",
-        "幾何", "光速", "粒子", "星際", "異星", "幻影", "沉浸", "動態", "重力", "裂變",
-        "聚變", "躍遷", "弦化", "晶格", "碎星", "霓虹", "幽能", "靈能", "超凡", "異能"
-    ];
+/* ════════════════════════════════════
+   自訂選單初始化
+════════════════════════════════════ */
+function initSelect(elementId, dataArray, defaultVal) {
+    const wrapper     = document.getElementById(elementId);
+    const box         = wrapper.querySelector('.select-box');
+    const grid        = wrapper.querySelector('.options-grid');
+    const hiddenInput = wrapper.querySelector('input[type="hidden"]');
 
-    const themeNouns = {
-        red: ["緋紅", "熔岩", "丹砂", "瑪瑙", "烈焰", "玫瑰", "霞光", "血月"],
-        orange: ["琥珀", "耀金", "流沙", "餘暉", "焰火", "焦糖", "橙光", "赤金"],
-        yellow: ["熒光", "星芒", "曜金", "暖陽", "晨曦", "金沙", "黃玉", "閃電"],
-        green: ["翠綠", "翡翠", "極光", "幽林", "碧石", "蒼翠", "霓綠", "毒石"],
-        cyan: ["琉璃", "冰川", "碧波", "幻青", "蒼穹", "霜星", "寒冰", "水晶"],
-        blue: ["幽藍", "蒼藍", "湛藍", "深淵", "電晶", "冰藍", "蔚藍", "海淵"],
-        purple: ["暮紫", "星塵", "幽紫", "霓紫", "幻紫", "紫晶", "魅影", "虛空"],
-        gray: ["鈦灰", "秘銀", "曜黑", "珍珠", "星灰", "隕石", "幻白", "黯影"]
-    };
-
-    function initSelect(elementId, dataArray) {
-        const wrapper = document.getElementById(elementId);
-        const box = wrapper.querySelector('.select-box');
-        const grid = wrapper.querySelector('.options-grid');
-        const hiddenInput = wrapper.querySelector('input[type="hidden"]');
-
-        dataArray.forEach(item => {
-            let div = document.createElement('div');
-            div.className = 'option-item';
-            div.innerText = item;
-            div.onclick = (e) => {
-                e.stopPropagation();
-                box.innerText = item;
-                hiddenInput.value = item === "無" ? "" : item;
-                grid.classList.remove('show');
-            };
-            grid.appendChild(div);
-        });
-
-        box.onclick = () => {
-            document.querySelectorAll('.options-grid').forEach(g => {
-                if(g !== grid) g.classList.remove('show');
-            });
-            grid.classList.toggle('show');
-        };
-    }
-
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.custom-select')) {
-            document.querySelectorAll('.options-grid').forEach(g => g.classList.remove('show'));
+    dataArray.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'option-item';
+        div.textContent = item;
+        if (item === defaultVal || (defaultVal === '' && item === '無')) {
+            div.classList.add('selected');
         }
+        div.addEventListener('click', e => {
+            e.stopPropagation();
+            // 清除舊選中
+            grid.querySelectorAll('.option-item').forEach(d => d.classList.remove('selected'));
+            div.classList.add('selected');
+
+            const display = item === "無" ? "無（點擊展開）" : item;
+            box.textContent = display;
+            hiddenInput.value = item === "無" ? "" : item;
+            grid.classList.remove('show');
+            box.classList.remove('open');
+            updateStylePreview();
+        });
+        grid.appendChild(div);
     });
 
-    function hexToHSL(hex) {
-        let r = parseInt(hex.substring(1,3), 16) / 255;
-        let g = parseInt(hex.substring(3,5), 16) / 255;
-        let b = parseInt(hex.substring(5,7), 16) / 255;
-        let max = Math.max(r, g, b), min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
-
-        if (max === min) {
-            h = s = 0;
-        } else {
-            let d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
+    box.addEventListener('click', e => {
+        e.stopPropagation();
+        // 關閉其他選單
+        document.querySelectorAll('.options-grid').forEach(g => {
+            if (g !== grid) {
+                g.classList.remove('show');
+                g.closest('.custom-select').querySelector('.select-box').classList.remove('open');
             }
-            h /= 6;
-        }
-        return { h: h * 360, s: s * 100, l: l * 100 };
-    }
-
-    function getMatchedNoun(hex, hash) {
-        const hsl = hexToHSL(hex);
-        const h = hsl.h;
-        const s = hsl.s;
-        let selectedArray = [];
-
-        if (s < 20) {
-            selectedArray = themeNouns.gray;
-        } else if (h >= 345 || h < 15) {
-            selectedArray = themeNouns.red;
-        } else if (h >= 15 && h < 45) {
-            selectedArray = themeNouns.orange;
-        } else if (h >= 45 && h < 75) {
-            selectedArray = themeNouns.yellow;
-        } else if (h >= 75 && h < 165) {
-            selectedArray = themeNouns.green;
-        } else if (h >= 165 && h < 195) {
-            selectedArray = themeNouns.cyan;
-        } else if (h >= 195 && h < 260) {
-            selectedArray = themeNouns.blue;
-        } else {
-            selectedArray = themeNouns.purple;
-        }
-
-        const index = Math.abs(hash >> 4) % selectedArray.length;
-        return selectedArray[index];
-    }
-
-    function updateColorPreviewFromTitle() {
-        const titleText = document.getElementById('report-title').value || "智慧科技";
-        
-        let hash = 0;
-        for (let i = 0; i < titleText.length; i++) {
-            hash = titleText.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        
-        let hex = '#';
-        for (let i = 0; i < 3; i++) {
-            let value = (Math.abs(hash >> (i * 8)) & 0xFF);
-            value = Math.max(100, value).toString(16); 
-            hex += value;
-        }
-        const themeHex = hex.toUpperCase();
-
-        const adjIndex = Math.abs(hash) % themeAdjectives.length;
-        const matchedNoun = getMatchedNoun(themeHex, hash);
-        const colorName = themeAdjectives[adjIndex] + matchedNoun;
-        
-        const displayColorName = `專屬 ${colorName}調`;
-        
-        const colorBox = document.getElementById('preview-color-box');
-        const colorText = document.getElementById('preview-color-text');
-        
-        colorBox.style.backgroundColor = themeHex;
-        colorBox.style.boxShadow = `0 0 16px 2px ${themeHex}`;
-        colorText.innerText = displayColorName;
-
-        document.getElementById('val-theme-color-name').value = colorName;
-        document.getElementById('val-theme-color-hex').value = themeHex;
-    }
-
-    initSelect('select-adj', dataAdj);
-    initSelect('select-color', dataColor);
-    initSelect('select-noun', dataNoun);
-    initSelect('select-type', dataType);
-    initSelect('select-chart-style', dataChartStyle);
-    initSelect('select-layout', dataLayout);
-    
-    window.onload = updateColorPreviewFromTitle;
-
-    function copyText(elementId, btnElement) {
-        const textToCopy = document.getElementById(elementId).value;
-        if (!textToCopy) {
-            alert("請先點擊「一鍵生成專屬 YAML 指令檔」！");
-            return;
-        }
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            btnElement.innerText = "已複製！";
-            btnElement.style.backgroundColor = "#2979FF"; 
-            btnElement.style.color = "#FFF";
-            
-            if (btnElement.copyTimeout) {
-                clearTimeout(btnElement.copyTimeout);
-            }
-            
-            btnElement.copyTimeout = setTimeout(() => {
-                btnElement.innerText = "一鍵複製";
-                btnElement.style.backgroundColor = ""; 
-                btnElement.style.color = "";
-            }, 2000);
-            
-        }).catch(err => {
-            alert("瀏覽器不支援一鍵複製，請手手動複製。");
         });
+        const isOpen = grid.classList.toggle('show');
+        box.classList.toggle('open', isOpen);
+    });
+}
+
+// 全域關閉
+document.addEventListener('click', () => {
+    document.querySelectorAll('.options-grid').forEach(g => g.classList.remove('show'));
+    document.querySelectorAll('.select-box').forEach(b => b.classList.remove('open'));
+});
+
+/* ════════════════════════════════════
+   步進器
+════════════════════════════════════ */
+function step(id, delta, min) {
+    const el = document.getElementById(id);
+    const newVal = (parseInt(el.value) || 0) + delta;
+    if (newVal >= min) el.value = newVal;
+}
+
+/* ════════════════════════════════════
+   風格組合即時預覽
+════════════════════════════════════ */
+function updateStylePreview() {
+    const adj   = document.getElementById('val-adj').value;
+    const color = document.getElementById('val-color').value;
+    const noun  = document.getElementById('val-noun').value || '核心';
+    const text  = `3D 擬真${adj}${color}${noun}`;
+    document.getElementById('style-preview-text').textContent = text;
+}
+
+/* ════════════════════════════════════
+   色彩演算
+════════════════════════════════════ */
+function hexToHSL(hex) {
+    let r = parseInt(hex.slice(1,3),16)/255;
+    let g = parseInt(hex.slice(3,5),16)/255;
+    let b = parseInt(hex.slice(5,7),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max+min)/2;
+    if (max === min) { h = s = 0; }
+    else {
+        const d = max-min;
+        s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+        switch(max){
+            case r: h = (g-b)/d + (g < b ? 6 : 0); break;
+            case g: h = (b-r)/d + 2; break;
+            case b: h = (r-g)/d + 4; break;
+        }
+        h /= 6;
     }
+    return { h: h*360, s: s*100, l: l*100 };
+}
 
-    function generateYAML() {
-        const adj = document.getElementById('val-adj').value;
-        const color = document.getElementById('val-color').value;
-        const noun = document.getElementById('val-noun').value;
-        
-        const type = document.getElementById('val-type').value;
-        const chartStyle = document.getElementById('val-chart-style').value;
-        const layout = document.getElementById('val-layout').value;
+function getMatchedNoun(hex, hash) {
+    const {h, s} = hexToHSL(hex);
+    let arr = themeNouns.gray;
+    if      (s >= 20 && (h >= 345 || h < 15))  arr = themeNouns.red;
+    else if (s >= 20 && h >= 15  && h < 45)    arr = themeNouns.orange;
+    else if (s >= 20 && h >= 45  && h < 75)    arr = themeNouns.yellow;
+    else if (s >= 20 && h >= 75  && h < 165)   arr = themeNouns.green;
+    else if (s >= 20 && h >= 165 && h < 195)   arr = themeNouns.cyan;
+    else if (s >= 20 && h >= 195 && h < 260)   arr = themeNouns.blue;
+    else if (s >= 20)                           arr = themeNouns.purple;
+    return arr[Math.abs(hash >> 4) % arr.length];
+}
 
-        const title = document.getElementById('report-title').value;
-        const subtitle = document.getElementById('report-subtitle').value;
-        const group = document.getElementById('report-group').value;
-        
-        let rawMembers = document.getElementById('report-members').value;
-        const members = rawMembers.trim().replace(/\r?\n/g, ', ').replace(/"/g, '\\"');
-        
-        const reportType = document.getElementById('report-type').value;
-        
-        // 防呆設計：抓取數字後自動補全單位後綴字串
-        const pages = document.getElementById('report-pages').value + "頁";
-        const time = document.getElementById('report-time').value + "分鐘";
-        
-        const scene = document.getElementById('report-scene').value;
+function computeTitleColor(text) {
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+        hash = text.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let hex = '#';
+    for (let i = 0; i < 3; i++) {
+        let v = Math.max(100, Math.abs(hash >> (i*8)) & 0xFF);
+        hex += v.toString(16).padStart(2,'0');
+    }
+    return { hex: hex.toUpperCase(), hash };
+}
 
-        let rawExtra = document.getElementById('report-extra').value;
-        const extra = rawExtra.trim().replace(/\r?\n/g, ', ').replace(/"/g, '\\"');
-        
-        let rawChartExtra = document.getElementById('chart-extra').value;
-        const chartExtra = rawChartExtra.trim().replace(/\r?\n/g, ', ').replace(/"/g, '\\"');
+let colorDebounceTimer = null;
+function onTitleInput() {
+    clearTimeout(colorDebounceTimer);
+    colorDebounceTimer = setTimeout(updateColorPreview, 120);
+}
 
-        const styleName = `3D擬真${adj}${color}${noun}`;
-        const generatedColorName = document.getElementById('val-theme-color-name').value;
-        const generatedColorHex = document.getElementById('val-theme-color-hex').value;
-        
-        const colorPrefix = color ? color : '預設';
-        const chartSpecificStyleName = `${colorPrefix}${type}${chartStyle}${layout}`;
+function updateColorPreview() {
+    const title = document.getElementById('report-title').value || "智慧科技";
+    const { hex, hash } = computeTitleColor(title);
+    const adjIdx  = Math.abs(hash) % themeAdjectives.length;
+    const noun    = getMatchedNoun(hex, hash);
+    const name    = themeAdjectives[adjIdx] + noun;
 
-        // --- 簡報 YAML 格式一 ---
-        const pptYaml1 = `# ==========================================
-# 3D擬真簡報與圖表風格生成引擎 - 簡報基礎設定
+    document.getElementById('color-dot').style.backgroundColor = hex;
+    document.getElementById('color-dot').style.boxShadow = `0 0 14px 3px ${hex}`;
+    document.getElementById('color-name').textContent = `專屬 ${name} 調`;
+    document.getElementById('color-hex-badge').textContent = hex;
+    document.getElementById('val-theme-color-name').value = name;
+    document.getElementById('val-theme-color-hex').value  = hex;
+}
+
+/* ════════════════════════════════════
+   生成函數
+════════════════════════════════════ */
+function generateAll() {
+    // 收集輸入值
+    const adj        = document.getElementById('val-adj').value;
+    const color      = document.getElementById('val-color').value;
+    const noun       = document.getElementById('val-noun').value || '核心';
+    const type       = document.getElementById('val-type').value;
+    const chartStyle = document.getElementById('val-chart-style').value;
+    const layout     = document.getElementById('val-layout').value;
+
+    const title      = document.getElementById('report-title').value.trim();
+    const subtitle   = document.getElementById('report-subtitle').value.trim();
+    const group      = document.getElementById('report-group').value.trim();
+    const pages      = document.getElementById('report-pages').value;
+    const time       = document.getElementById('report-time').value;
+    const scene      = document.getElementById('report-scene').value;
+    const reportType = document.getElementById('report-type').value;
+
+    // 組員格式化：每行 → 雙欄列出
+    const membersRaw   = document.getElementById('report-members').value.trim();
+    const membersList  = membersRaw.split('\n').map(s => s.trim()).filter(Boolean);
+    let membersBlock   = '';
+    for (let i = 0; i < membersList.length; i += 2) {
+        const left  = membersList[i]   || '';
+        const right = membersList[i+1] || '';
+        membersBlock += `    ${left.padEnd(20)}${right}\n`;
+    }
+    const membersSingle = membersList.join('、');
+
+    // 需求格式化
+    const extraRaw   = document.getElementById('report-extra').value.trim();
+    const extraBlock = extraRaw.split('\n').map(l => `    - "${l.trim()}"`).join('\n');
+
+    const chartExtraRaw = document.getElementById('chart-extra').value.trim();
+    const chartExtra    = chartExtraRaw || '（無特殊要求）';
+
+    // 風格名稱
+    const styleName           = `3D 擬真${adj}${color}${noun}`;
+    const colorPrefix         = color || '預設';
+    const chartSpecificStyle  = `${colorPrefix}${type}${chartStyle}${layout}`;
+
+    const colorName = document.getElementById('val-theme-color-name').value || '量子琉璃';
+    const colorHex  = document.getElementById('val-theme-color-hex').value  || '#64FFDA';
+
+    const now = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'2-digit', day:'2-digit' });
+
+    /* ---- YAML 一：簡報基礎設定 ---- */
+    const yaml1 = `# ==========================================
+# 3D 擬真簡報與圖表風格生成引擎
+# 輸出格式：簡報基礎設定（YAML 格式一）
+# 生成日期：${now}
 # ==========================================
+
 簡報基本設定:
   簡報主標題: "${title}"
   次標題: "${subtitle}"
   報告人: "${group}"
-  小組成員: "${members}"
-  簡報頁數: "${pages}"
-  報告時間: "${time}"
+  小組成員: |
+${membersBlock}
+  簡報類型: "${reportType}"
+  簡報頁數: "${pages} 頁"
+  報告時間: "${time} 分鐘"
   報告場景: "${scene}"
-  簡報補充需求: "${extra}"
+  補充需求:
+${extraBlock}
 
-簡報類型: "${reportType}"
-簡報大綱: "依據報告主題自動生成結構化章節"
-簡報風格:
+視覺風格設定:
+  風格名稱: "${styleName}"
   風格基底:
-    意境與概念定義（視覺氛圍）:
-      - "【最高指導原則一：絕對 3D 擬真】：定義整份簡報的靈魂與風格基調，強調極致的物理真實感與電影級沉浸體驗。後續所有色彩、PBR 材質與排版佈局皆以此為邏輯依據與先決條件。"
-      - "【最高指導原則二：主題物件連動】：每一頁的視覺特效與主圖，必須與該頁『核心主題』直接相關，並強制轉化為具體的 3D 立體物件。"
-  視覺主題: "${styleName}"
-  全體設計設定:
-    色彩策略:
-      背景色: "深邃暗色系底色"
-      主色調: "動態關聯色 (Dynamic Theme Color)：依據報告主題自動提取 3D 專屬色彩【${generatedColorName}】(渲染引擎指定色碼: ${generatedColorHex})"
-      輔助色: "數位對比色調"
-      文字色: "高反差清晰亮色"
-      點綴色: "高飽和警告標記色"
-    質感處理:
-      主題物件: "3D 主題物件結合${chartStyle}質感"
-    文字排版:
-      標題字體: "強制使用微軟正黑體 (Microsoft JhengHei) 或 思源黑體 (Noto Sans TC)"
-      內文字體: "強制使用思源黑體 (Noto Sans TC)"
-      字體大小規範(以1920x1080像素為基準):
-        大標題: "100-140像素"
-        次標題: "72-90像素"
-        次次標題: "48-60像素"
-        標準內文: "36-44像素"
-      防破圖與排版規則: "維持畫面高留白，資訊必須極簡化。全畫面最小字體極限為 36 像素，嚴禁出現低於此尺寸的細微文字以免產生亂碼！"
-    版面配置:
-      資訊極簡化: "絕對開啟"
-      空間立體層次: "強烈的環境光遮蔽與物件投射陰影"`;
+    - "【最高指導原則一：絕對 3D 擬真】：定義整份簡報的靈魂與風格基調，強調極致的物理真實感與電影級沉浸體驗。後續所有色彩、PBR 材質與排版佈局皆以此為邏輯依據與先決條件。"
+    - "【最高指導原則二：主題物件連動】：每一頁的視覺特效與主圖，必須與該頁核心主題直接相關，並強制轉化為具體的 3D 立體物件。"
+  色彩策略:
+    主題演算色名: "${colorName}"
+    主題演算色碼: "${colorHex}"
+    背景色: "深邃暗色系底色（#060B1A）"
+    輔助色: "數位對比色調（#2979FF）"
+    文字色: "高反差清晰亮色（#F5F7FA）"
+    警告色: "高飽和警告標記色（#FF3D00）"
+  質感設定:
+    主題物件材質: "${chartStyle}"
+    3D 渲染要求: "物理基礎渲染（PBR）+ 全域光照"
 
-        // --- 簡報 YAML 格式二 ---
-        const pptYaml2 = `# ==========================================
-# 3D擬真簡報與圖表風格生成引擎 - 視覺主題設定檔
+字體排版規範（1920×1080 基準）:
+  字體族群: "強制使用微軟正黑體 / 思源黑體（Noto Sans TC）"
+  禁止使用: "任何明體、宋體等有襯線字體"
+  字級規範:
+    首頁大標題: "100 – 140 px（視覺衝擊上限）"
+    章節次標題: "72 – 90 px"
+    區塊小標題: "48 – 60 px"
+    標準內文:   "36 – 44 px（全畫面絕對下限）"
+  排版鐵律: "最小字體極限為 36 px，嚴禁低於此值以防 AI 渲染破碎字。畫面保持高留白，資訊必須極簡化。"
+  輸出語系: "強制台灣正體中文（UTF-8）"`;
+
+    /* ---- YAML 二：視覺主題完整設定 ---- */
+    const yaml2 = `# ==========================================
+# 3D 擬真簡報與圖表風格生成引擎
+# 輸出格式：視覺主題完整設定（YAML 格式二）
 # 主題名稱：${styleName}
-# 設計風格：物理擬真質感、高科技微漸層、立體光影
-# 語系優化：強制台灣繁體中文標準無襯線字體系統
+# 設計語言：物理擬真 PBR × 高科技微漸層 × 電影級立體光影
+# 語系：強制台灣繁體中文無襯線字體系統
+# 生成日期：${now}
 # ==========================================
 
 主題設定:
-  風格基底:
-    意境與概念定義（視覺氛圍）:
-      - "【最高指導原則一：絕對 3D 擬真】：定義整份簡報的靈魂與風格基調，強調極致的物理真實感與電影級沉浸體驗。後續所有色彩、PBR 材質與排版佈局皆以此為邏輯依據與先決條件。"
-      - "【最高指導原則二：主題物件連動】：每一頁的視覺特效與主圖，必須與該頁『核心主題』直接相關，並強制轉化為具體的 3D 立體物件。"
-
   元數據:
-    名稱: "${styleName}"
-    版本: "4.0.0 (意境基底錨定版)"
-    設計師: "AI 顧問"
-    描述: "模擬高階中控台與物理立體按鍵質感，完美契合${scene}之展示需求"
+    主題名稱: "${styleName}"
+    版本:     "5.0.0"
+    設計師:   "AI 顧問"
+    描述:     "適用於 ${scene} 之高沉浸感 3D 擬真視覺方案"
+    生成日期: "${now}"
 
-  報告基本資訊帶入:
-    首頁主標題: "${title}"
-    首頁次標題: "${subtitle}"
+  風格基底:
+    意境定義（視覺氛圍）:
+      - "【最高指導原則一：絕對 3D 擬真】：強調極致物理真實感與電影級沉浸體驗，後續所有色彩、PBR 材質、排版佈局以此為先決條件。"
+      - "【最高指導原則二：主題物件連動】：每頁視覺特效與主圖必須與核心主題直接相關，強制轉化為具體 3D 立體物件。"
+
+  報告基本資訊:
+    主標題:   "${title}"
+    次標題:   "${subtitle}"
     報告單位: "${group}"
-    團隊成員: "${members}"
-    報告類型: "${reportType}"
-    簡報補充需求: "${extra}"
+    成員名單: "${membersSingle}"
+    簡報類型: "${reportType}"
+    補充需求:
+${extraBlock}
 
   色彩矩陣:
-    主背景色: "#060B1A"
-    區塊背景色: "#0E1832"
-    3D專屬主題名稱: "${generatedColorName}"
-    3D專屬主視覺色: "${generatedColorHex}"
-    輔助視覺色: "#2979FF"
-    突顯警告色: "#FF3D00"
-    主要文字色: "#F5F7FA"
-    次要文字色: "#78909C"
-    邊框線條色: "#1E3A8A"
+    主背景色:       "#060B1A"
+    卡片背景色:     "#0E1832"
+    3D主題色名稱:   "${colorName}"
+    3D主題色色碼:   "${colorHex}"
+    輔助視覺色:     "#2979FF"
+    突顯警告色:     "#FF3D00"
+    主要文字色:     "#F5F7FA"
+    次要文字色:     "#78909C"
+    邊框線條色:     "#1E3A8A"
 
-  字體與防亂碼排版系統:
-    字體限制: "絕對禁止使用明體或宋體等襯線字體"
-    標題字體群組: "微軟正黑體, 思源黑體"
-    內文字體群組: "思源黑體, 蘋方體"
-    安全字級設定(確保像素網格特徵完整):
-      首頁大標題: "100像素以上"
-      簡報頁次標題: "72像素以上"
-      區塊小標題: "48像素以上"
-      內文與備註極限底線: "絕對不低於 36像素"
-    排版場景優化: "針對【${scene}】實施資訊極簡化，嚴格限制任何小於 36 像素的文字特徵，以防 AI 渲染破碎字"
+  字體與防亂碼排版:
+    禁止字體: "嚴格禁止使用明體、宋體等任何有襯線字體"
+    標題字體: "微軟正黑體（Microsoft JhengHei）、思源黑體（Noto Sans TC）"
+    內文字體: "思源黑體（Noto Sans TC）、蘋方體（PingFang TC）"
+    字級安全設定:
+      首頁大標題:   "≥ 100 px"
+      簡報次標題:   "≥ 72 px"
+      區塊小標題:   "≥ 48 px"
+      內文絕對下限: "≥ 36 px（禁止低於此值）"
+    場景優化: "針對「${scene}」實施資訊極簡化，全面排查低於 36 px 之微小文字"
     行高比例:
       標題行高: 1.3
       內文行高: 1.6
 
-  畫面佈局與組件樣式:
+  畫面佈局:
     卡片樣式:
-      背景顏色: "區塊背景色"
-      邊角圓圓角: "10像素"
-      陰影特效: "內嵌反光與深層環境漫射陰影"
+      背景: "卡片背景色"
+      圓角: "10 px"
+      陰影: "內嵌反光 + 深層環境漫射陰影"
 
-  擬真渲染設定:
-    環境光源: "頂部冷白投射燈"
-    材質質感: "${chartStyle}與立體厚度"
-    表面折射: "強"
-    陰影硬度: "漸進式柔和"`;
+  擬真渲染:
+    環境光源:   "頂部冷白投射燈 + 側面補光"
+    主題材質:   "${chartStyle}與立體厚度感"
+    表面折射:   "強"
+    陰影硬度:   "漸進式柔和"
+    PBR要求:    "全域光照 + 環境遮蔽（AO）"`;
 
-        // --- 資訊圖表 YAML ---
-        const chartYaml = `# ==========================================
-# 3D擬真簡報與圖表風格生成引擎 - 資訊圖表設定檔
+    /* ---- YAML 三：資訊圖表設定 ---- */
+    const yaml3 = `# ==========================================
+# 3D 擬真簡報與圖表風格生成引擎
+# 輸出格式：資訊圖表專用設定（YAML 格式三）
+# 圖表風格名稱：${chartSpecificStyle}
+# 生成日期：${now}
 # ==========================================
-圖表基本資訊帶入:
-  主標題: "${title}"
-  報告人: "${group}"
-  小組成員: "${members}"
-  圖表補充需求: "${chartExtra}"
+
+圖表基本資訊:
+  主標題:   "${title}"
+  報告人:   "${group}"
+  成員名單: "${membersSingle}"
+  圖表補充: "${chartExtra}"
 
 圖表架構設定:
   風格基底:
-    意境與概念定義（視覺氛圍）:
-      - "【最高指導原則一：絕對 3D 擬真】：定義整份圖表的靈魂與風格基調，強調極致的物理真實感與電影級沉浸體驗。後續所有色彩、PBR 材質與排版佈局皆以此為邏輯依據與先決條件。"
-      - "【最高指導原則二：主題物件連動】：圖表的視覺特效與數據主圖，必須與『核心主題』直接相關，並強制轉化為具體的 3D 立體物件。"
-  圖表模組配置:
-    需求類型: "${type}"
-    圖表風格: "${chartStyle}"
-    畫面佈局: "${layout}"
-  
+    意境定義:
+      - "【最高指導原則一：絕對 3D 擬真】：強調極致物理真實感，後續所有色彩、PBR 材質以此為先決條件。"
+      - "【最高指導原則二：主題物件連動】：圖表視覺特效與數據主圖必須與核心主題直接相關，強制轉化為 3D 立體物件。"
+  模組配置:
+    圖表需求類型: "${type}"
+    圖表視覺風格: "${chartStyle}"
+    畫面佈局:    "${layout}"
+
 色彩與渲染演算:
-  圖表專屬風格命名: "${chartSpecificStyleName}"
-  參數來源宣告: "本圖表僅採用圖表模組、色調模組與3D專屬色調生成，確保資訊聚焦"
-  基礎色調模組: "${colorPrefix}"
-  3D演算主軸色: "${generatedColorName} (${generatedColorHex})"
-  背景環境對比: "深色背景襯托高亮度資料節點"
+  圖表風格命名:   "${chartSpecificStyle}"
+  基礎色調:       "${colorPrefix}"
+  3D演算主軸色:   "${colorName}（${colorHex}）"
+  主題演算色:     "${colorHex}"
+  背景環境:       "深色背景（#060B1A）襯托高亮度資料節點"
+  輔助強調色:     "#2979FF"
+  資料警示色:     "#FF3D00"
 
-立體結構與防破圖設定:
-  物件層次: "Z軸深度拔高，強化前後景景深效果"
-  資訊連接: "立體管線與自發光迴路連接資料點"
-  字體強制要求: "全面使用微軟正黑體或思源黑體"
-  文字標籤: "懸浮式立體文字面板，面對攝影機視角"
-  安全字級規範: "圖表標籤與數據文字一律放大至 48像素至60像素，絕對禁止低於 36像素之微小備註，確保 AI 網格渲染正確"`;
+立體結構設定:
+  物件層次:   "Z 軸深度拔高，強化前後景景深效果"
+  資訊連接:   "立體管線 + 自發光迴路連接各資料節點"
+  懸浮面板:   "文字標籤採懸浮式立體面板，始終面對攝影機視角"
 
-        // 將結果寫入 Textarea
-        document.getElementById('output-ppt-1').value = pptYaml1;
-        document.getElementById('output-ppt-2').value = pptYaml2;
-        document.getElementById('output-chart').value = chartYaml;
-    }
+防破圖字體規範:
+  字體要求:   "全面使用微軟正黑體或思源黑體，嚴禁任何有襯線字體"
+  圖表標籤:   "資料標籤字級放大至 48 – 60 px"
+  數據文字:   "關鍵數值不低於 48 px"
+  絕對下限:   "任何文字元素絕對禁止低於 36 px，以確保 AI 網格渲染正確"
+  語系:       "強制台灣正體中文（UTF-8）"
+
+渲染技術參數:
+  材質系統:   "${chartStyle}質感 + PBR 材質貼圖"
+  光照系統:   "HDR 環境貼圖 + 動態陰影"
+  後製效果:   "景深模糊（Depth of Field）+ 螢幕空間環境遮蔽（SSAO）"
+  解析度基準: "1920 × 1080（支援 4K 向量化輸出）"`;
+
+    // 寫入 textarea 並更新字數
+    setOutput('output-1', yaml1, 'count-1');
+    setOutput('output-2', yaml2, 'count-2');
+    setOutput('output-3', yaml3, 'count-3');
+
+    // 顯示輸出區塊
+    const section = document.getElementById('output-section');
+    section.style.display = 'flex';
+    setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    showToast('三份 YAML 指令檔生成完成！');
+}
+
+function setOutput(id, text, countId) {
+    document.getElementById(id).value = text;
+    document.getElementById(countId).textContent = `${text.length} 字元`;
+}
+
+/* ════════════════════════════════════
+   複製 / 下載
+════════════════════════════════════ */
+function copyOutput(textareaId, btnId) {
+    const text = document.getElementById(textareaId).value;
+    if (!text.trim()) { showToast('請先生成 YAML！', true); return; }
+    const btn = document.getElementById(btnId);
+
+    navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✓ 已複製！';
+        btn.classList.add('done');
+        showToast('已複製至剪貼簿！');
+        clearTimeout(btn._t);
+        btn._t = setTimeout(() => {
+            btn.textContent = '複製全文';
+            btn.classList.remove('done');
+        }, 2500);
+    }).catch(() => showToast('請手動全選複製（Ctrl+A）', true));
+}
+
+function downloadOutput(textareaId, suffix) {
+    const text = document.getElementById(textareaId).value;
+    if (!text.trim()) { showToast('請先生成 YAML！', true); return; }
+    const title = (document.getElementById('report-title').value.trim() || 'output').slice(0,20).replace(/\s+/g,'_');
+    const filename = `${title}_${suffix}.yaml`;
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast(`已下載：${filename}`);
+}
+
+/* ════════════════════════════════════
+   Toast 提示
+════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg, isErr = false) {
+    const el = document.getElementById('toast');
+    el.textContent = (isErr ? '⚠ ' : '✓ ') + msg;
+    el.className = 'toast' + (isErr ? ' err' : '') + ' show';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ════════════════════════════════════
+   初始化
+════════════════════════════════════ */
+initSelect('select-adj',        dataAdj,        '無');
+initSelect('select-color',      dataColor,      '無');
+initSelect('select-noun',       dataNoun,       '核心');
+initSelect('select-type',       dataType,       '數據分析');
+initSelect('select-chart-style',dataChartStyle, '玻璃擬真');
+initSelect('select-layout',     dataLayout,     '網格陣列');
+
+window.addEventListener('load', () => {
+    updateColorPreview();
+    updateStylePreview();
+});
 </script>
-
 </body>
 </html>
