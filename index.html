@@ -228,10 +228,32 @@
             max-height: 260px;
             overflow-y: auto;
         }
+        /* 6×5 全展開格（圖表類型/佈局/視覺風格，不需滾動）*/
+        .options-grid.cols-6 {
+            grid-template-columns: repeat(6, 1fr);
+            max-height: none;
+            overflow-y: visible;
+        }
         .options-grid.show { display: grid; }
         .options-grid::-webkit-scrollbar { width: 5px; }
         .options-grid::-webkit-scrollbar-track { background: transparent; }
         .options-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* 分類標題行 */
+        .option-cat {
+            grid-column: 1 / -1;
+            font-size: 10.5px;
+            font-weight: bold;
+            letter-spacing: 1.2px;
+            color: var(--text-dim);
+            padding: 4px 2px 2px;
+            border-bottom: 1px dashed rgba(0,229,255,0.15);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+        .option-cat.cat-static { color: #69F0AE; border-color: rgba(105,240,174,0.2); }
+        .option-cat.cat-dynamic { color: #FFD740; border-color: rgba(255,215,64,0.2); }
 
         .option-item {
             padding: 7px 4px;
@@ -441,12 +463,255 @@
             animation: sweep 1.1s ease-in-out infinite;
         }
 
+        /* ── 整合型橫排：下拉左 ＋ 說明卡右 ── */
+        .combo-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+
+        /* 類型 + 佈局同一行，說明卡下一行 */
+        .combo-twin-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+        .combo-twin-desc {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .combo-select-wrap { position: relative; }
+        .combo-select-wrap select {
+            width: 100%;
+            padding: 11px 36px 11px 14px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: var(--bg-input) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2378909C' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            height: 100%;
+            min-height: 44px;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .combo-select-wrap select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: var(--glow);
+        }
+        /* 說明卡：與下拉等高 */
+        .combo-info-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid rgba(0,229,255,0.18);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 44px;
+        }
+        .combo-info-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(0,229,255,0.07);
+            border-bottom: 1px solid rgba(0,229,255,0.12);
+            flex-wrap: wrap;
+        }
+        .combo-info-badge {
+            font-size: 10.5px;
+            font-weight: bold;
+            letter-spacing: 0.6px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .badge-type  { background: rgba(41,121,255,0.25); color: #82B1FF; border: 1px solid rgba(41,121,255,0.4); }
+        .badge-flow  { background: rgba(0,230,118,0.18);  color: #69F0AE; border: 1px solid rgba(0,230,118,0.35); }
+        .badge-layout{ background: rgba(255,171,0,0.15);  color: #FFD740; border: 1px solid rgba(255,171,0,0.3); }
+        .combo-info-title {
+            font-size: 12.5px;
+            font-weight: bold;
+            color: var(--text);
+        }
+        .combo-info-body {
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #90A4AE;
+            line-height: 1.65;
+            background: rgba(0,0,0,0.25);
+            flex: 1;
+        }
+        .combo-info-body strong { color: #B2EBF2; }
+
+        /* RWD：窄螢幕改回上下排列 */
+        @media (max-width: 1100px) {
+            .combo-row { grid-template-columns: 1fr; }
+            .combo-info-card { height: auto; min-height: unset; }
+            .combo-select-wrap select { height: auto; }
+        }
+
+        /* ── 層次分隔標題（class 版）── */
+        .layer-header {
+            font-size: 11px; font-weight: bold; letter-spacing: 1.2px; color: #78909C;
+            text-transform: uppercase; margin-bottom: 12px; padding-bottom: 7px;
+            border-bottom: 1px dashed #1E3A8A; display: flex; align-items: baseline; gap: 6px;
+        }
+        .layer-header .lh-accent  { color: #00E5FF; }
+        .layer-header .lh-desc    { font-weight: normal; color: #546E7A; font-size: 11px; }
+        .layer-header + .form-group { margin-top: 0; }
+        .layer-sep { margin: 20px 0 14px; }
+
+        /* ── 緊湊三欄網格（Section 02）── */
+        .grid-3c {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+        .grid-3c .span-2 { grid-column: span 2; }
+        .grid-3c .span-3 { grid-column: span 3; }
+
+        /* ── 成員標籤卡片 ── */
+        .member-board {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 12px 8px;
+            min-height: 54px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            align-items: center;
+            cursor: text;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .member-board:focus-within {
+            border-color: var(--border-focus);
+            box-shadow: var(--glow);
+        }
+        .member-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #152040;
+            border: 1px solid #1E3A8A;
+            border-radius: 6px;
+            padding: 6px 10px 6px 12px;
+            font-size: 13px;
+            color: var(--text);
+            cursor: default;
+            transition: border-color var(--transition), background var(--transition);
+            user-select: none;
+        }
+        .member-tag:hover { border-color: var(--accent); background: #1a2d54; }
+        .member-tag .tag-remove {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: var(--text-dim);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background var(--transition), color var(--transition);
+            padding: 0; line-height: 1;
+            flex-shrink: 0;
+        }
+        .member-tag .tag-remove:hover { background: var(--danger); color: #fff; }
+        .member-tag-input {
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            min-width: 100px;
+            flex: 1;
+            padding: 4px 2px;
+        }
+        .member-tag-input::placeholder { color: var(--text-dim); }
+
+        /* ── RWD Section 02 ── */
+        @media (max-width: 900px) {
+            .grid-3c { grid-template-columns: 1fr 1fr; }
+            .grid-3c .span-2 { grid-column: span 2; }
+            .grid-3c .span-3 { grid-column: span 2; }
+        }
+        @media (max-width: 600px) {
+            .grid-3c { grid-template-columns: 1fr; }
+            .grid-3c .span-2, .grid-3c .span-3 { grid-column: span 1; }
+        }
+
+        /* ── 進階輸出選項面板 ── */
+        .advanced-panel {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .advanced-toggle {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 13px 18px;
+            background: rgba(0,229,255,0.03);
+            cursor: pointer;
+            user-select: none;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: background var(--transition), color var(--transition);
+            font-family: inherit;
+        }
+        .advanced-toggle:hover { background: rgba(0,229,255,0.07); color: var(--accent); }
+        .advanced-toggle .toggle-arrow {
+            transition: transform var(--transition);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+        .advanced-toggle.open .toggle-arrow { transform: rotate(180deg); }
+        .advanced-toggle.open { color: var(--accent); }
+
+        .advanced-body {
+            display: none;
+            padding: 18px 20px 20px;
+            border-top: 1px solid var(--border-d, #232936);
+            background: rgba(0,0,0,0.15);
+        }
+        .advanced-body.open { display: block; }
+
+        /* 進階三欄（補充需求 + 禁止項目 + 繪圖指令）*/
+        .adv-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 900px) {
+            .adv-grid-3 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .adv-grid-3 { grid-template-columns: 1fr; }
+        }
+
         /* ── RWD ── */
         @media (max-width: 900px) {
             .container { padding: 24px 20px; }
             .grid-2 { grid-template-columns: 1fr; }
             .grid-3 { grid-template-columns: 1fr 1fr; }
             .options-grid { grid-template-columns: repeat(4,1fr); }
+            .combo-twin-row, .combo-twin-desc { grid-template-columns: 1fr; }
         }
         @media (max-width: 600px) {
             .container { padding: 18px 14px; }
@@ -465,14 +730,13 @@
 <div class="toast" id="toast"></div>
 
 <div class="page-header">
-    <h1>3D 擬真簡報與圖表風格生成引擎 <span class="badge">v2.0</span></h1>
-    <div class="sub">組合風格模組 → 填寫資訊 → 一鍵生成三份 YAML 指令檔</div>
+    <h1>3D 擬真簡報與圖表風格生成引擎 <span class="badge">v3.3</span></h1>
 </div>
 
 <div class="container">
 
-    <!-- ══ 區塊一：風格模組 ══ -->
-    <div class="section-title"><span>01</span> &nbsp;風格模組組合</div>
+    <!-- ══ 區塊一：簡報風格模組組合 ══ -->
+    <div class="section-title"><span>01</span> &nbsp;簡報風格模組組合</div>
     <div class="grid-2">
 
         <!-- 左：簡報風格 -->
@@ -482,15 +746,7 @@
                 <input type="text" value="3D 擬真 + 主題物件連動" readonly>
             </div>
             <div class="form-group">
-                <label>形容詞模組 <span class="label-sub">(可不選 / 30 種)</span></label>
-                <div class="custom-select" id="select-adj">
-                    <div class="select-box" data-placeholder="無（點擊展開選擇）">無（點擊展開）</div>
-                    <div class="options-grid"></div>
-                    <input type="hidden" id="val-adj" value="">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>色調模組 <span class="label-sub">(可不選 / 30 種)</span></label>
+                <label>色調模組 <span class="label-sub">(可不選 / 60 種 · 靜態＋動態＋東方)</span></label>
                 <div class="custom-select" id="select-color">
                     <div class="select-box" data-placeholder="無（點擊展開選擇）">無（點擊展開）</div>
                     <div class="options-grid"></div>
@@ -498,7 +754,15 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>名詞模組 <span class="label-sub">(必選 / 30 種)</span></label>
+                <label>形容詞模組 <span class="label-sub">(可不選 / 60 種 · 靜態＋動態＋東方)</span></label>
+                <div class="custom-select" id="select-adj">
+                    <div class="select-box" data-placeholder="無（點擊展開選擇）">無（點擊展開）</div>
+                    <div class="options-grid"></div>
+                    <input type="hidden" id="val-adj" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>名詞模組 <span class="label-sub">(必選 / 60 種 · 靜態＋動態＋東方)</span></label>
                 <div class="custom-select" id="select-noun">
                     <div class="select-box">核心（點擊展開）</div>
                     <div class="options-grid"></div>
@@ -507,51 +771,87 @@
             </div>
         </div>
 
-        <!-- 右：圖表設定 -->
-        <div>
-            <div class="form-group">
-                <label>圖表需求類型 <span class="label-sub">(30 種)</span></label>
-                <div class="custom-select" id="select-type">
-                    <div class="select-box">數據分析（點擊展開）</div>
-                    <div class="options-grid"></div>
-                    <input type="hidden" id="val-type" value="數據分析">
+        <!-- 右：風格名稱即時預覽 -->
+        <div style="display:flex; align-items:flex-start;">
+            <div style="width:100%;">
+                <div class="style-preview" id="style-preview-bar" style="margin-bottom:0;">
+                    <span class="label">風格名稱：</span>
+                    <span class="value" id="style-preview-text">3D 擬真核心</span>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>圖表視覺風格 <span class="label-sub">(30 種)</span></label>
-                <div class="custom-select" id="select-chart-style">
-                    <div class="select-box">玻璃擬真（點擊展開）</div>
-                    <div class="options-grid"></div>
-                    <input type="hidden" id="val-chart-style" value="玻璃擬真">
+                <div style="margin-top:10px; font-size:12px; color:var(--text-dim); line-height:1.8; padding:10px 14px; background:rgba(0,229,255,0.03); border:1px dashed rgba(0,229,255,0.12); border-radius:var(--radius);">
+                    <div>組合順序：<strong style="color:var(--accent);">基底 ＋ 色調 ＋ 形容詞 ＋ 名詞</strong></div>
+                    <div style="margin-top:6px; color:#546E7A;">
+                        基底固定為「3D 擬真」，色調與形容詞可不選，<br>名詞為必選。四者組合即為本份簡報的視覺主題名稱。
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>畫面佈局 <span class="label-sub">(30 種)</span></label>
-                <div class="custom-select" id="select-layout">
-                    <div class="select-box">網格陣列（點擊展開）</div>
-                    <div class="options-grid"></div>
-                    <input type="hidden" id="val-layout" value="網格陣列">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>圖表補充需求 <span class="label-sub">(選填)</span></label>
-                <textarea id="chart-extra" rows="3" placeholder="數據重點、風格避諱或版面要求..."></textarea>
             </div>
         </div>
     </div>
 
-    <!-- 風格組合即時預覽 -->
-    <div class="style-preview" id="style-preview-bar">
-        <span class="label">目前風格組合：</span>
-        <span class="value" id="style-preview-text">3D 擬真核心</span>
+    <hr class="divider">
+
+    <!-- ══ 區塊二：資訊圖表風格模組組合 ══ -->
+    <div class="section-title"><span>02</span> &nbsp;資訊圖表風格模組組合</div>
+
+    <div class="combo-twin-row">
+        <div class="form-group" style="margin-bottom:0;">
+            <label>圖表需求類型 <span class="label-sub">(50 種 · 依動線類別分組)</span></label>
+            <div class="custom-select" id="select-type">
+                <div class="select-box">數據分析（點擊展開）</div>
+                <div class="options-grid cols-6"></div>
+                <input type="hidden" id="val-type" value="數據分析"
+                    data-flow="F字型動線" data-flow-desc="視線橫掃頂部→中段→左側縱讀，適合多欄並列數字">
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+            <label>畫面佈局 <span class="label-sub">(50 種 · 依空間特性分組)</span></label>
+            <div class="custom-select" id="select-layout">
+                <div class="select-box">網格陣列（點擊展開）</div>
+                <div class="options-grid cols-6"></div>
+                <input type="hidden" id="val-layout" value="網格陣列"
+                    data-note="均勻矩形格狀排列，適合多項目並列比較，結合 F 字型動線效果最佳">
+            </div>
+        </div>
     </div>
+
+            <!-- 說明卡下一行 -->
+            <div class="combo-twin-desc">
+                <div class="combo-info-card" id="type-info-card">
+                    <div class="combo-info-header">
+                        <span class="combo-info-badge badge-type">圖表目的</span>
+                        <span class="combo-info-title" id="type-info-title">數據分析</span>
+                        <span class="combo-info-badge badge-flow" id="type-flow-badge" style="margin-left:auto;">F字型動線</span>
+                    </div>
+                    <div class="combo-info-body">
+                        <strong>動線說明：</strong><span id="type-flow-desc">視線橫掃頂部→中段→左側縱讀，適合多欄並列數字</span>
+                    </div>
+                </div>
+                <div class="combo-info-card" id="layout-info-card">
+                    <div class="combo-info-header">
+                        <span class="combo-info-badge badge-layout">空間配置</span>
+                        <span class="combo-info-title" id="layout-info-title">網格陣列</span>
+                    </div>
+                    <div class="combo-info-body">
+                        <strong>排版說明：</strong><span id="layout-info-desc">均勻矩形格狀排列，適合多項目並列比較，結合 F 字型動線效果最佳</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>圖表視覺風格 <span class="label-sub">(50 種 · 科技＋材質＋東方三大類)</span></label>
+                <div class="custom-select" id="select-chart-style">
+                    <div class="select-box">玻璃擬真（點擊展開）</div>
+                    <div class="options-grid cols-6"></div>
+                    <input type="hidden" id="val-chart-style" value="玻璃擬真">
+                </div>
+            </div>
 
     <hr class="divider">
 
-    <!-- ══ 區塊二：基本資訊 ══ -->
-    <div class="section-title"><span>02</span> &nbsp;團隊基本資訊</div>
+    <!-- ══ 區塊三：團隊基本資訊 ══ -->
+    <div class="section-title"><span>03</span> &nbsp;團隊基本資訊</div>
 
-    <!-- 色調預覽 -->
+    <!-- 色調預覽列 -->
     <div class="color-preview-bar">
         <span class="color-preview-label">主題專屬 3D 色調：</span>
         <div class="color-pill">
@@ -564,82 +864,356 @@
     <input type="hidden" id="val-theme-color-name" value="">
     <input type="hidden" id="val-theme-color-hex"  value="">
 
-    <div class="grid-2">
-        <div>
-            <div class="form-group">
-                <label>簡報主題 <span class="label-sub">(輸入時自動演算色調)</span></label>
-                <input type="text" id="report-title" value="智慧科技導入與營運策略報告" oninput="onTitleInput()">
-            </div>
-            <div class="form-group">
-                <label>次標題 <span class="label-sub">(學校 / 系級)</span></label>
-                <input type="text" id="report-subtitle" value="健行科技大學 進二技 工管三甲">
-            </div>
-            <div class="form-group">
-                <label>報告人 <span class="label-sub">(組別)</span></label>
-                <input type="text" id="report-group" value="第六小組">
-            </div>
-            <div class="form-group">
-                <label>小組成員 <span class="label-sub">(每行一人，自動轉換格式)</span></label>
-                <textarea id="report-members" rows="5">楊啟正 C11431109
-鍾曉彤 C11431125
-蕭建鳴 C11431105
-蘇萬紘 C11431124
-陳國銘 C11431120
-詹朝元 C11431143</textarea>
+    <!-- 三欄緊湊網格 -->
+    <div class="grid-3c">
+
+        <!-- 行1：簡報主題（跨2欄）+ 簡報類型 -->
+        <div class="span-2 form-group">
+            <label>簡報主題 <span class="label-sub">(輸入時自動演算色調)</span></label>
+            <input type="text" id="report-title" value="智慧科技導入與營運策略報告" oninput="onTitleInput()">
+        </div>
+        <div class="form-group">
+            <label>簡報類型</label>
+            <div class="combo-select-wrap">
+                <select id="report-type" onchange="onReportTypeSelect()">
+                    <optgroup label="── 學術 / 研究 ──">
+                        <option value="論文發表" selected
+                            data-struct="一、緒論　二、文獻探討　三、研究方法與設計　四、資料分析結果　五、結論與建議　※ 參考文獻"
+                            data-note="嚴謹學術五章架構，每章對應一個論述層次，圖表以數據佐證為主，參考文獻置於末頁">論文發表</option>
+                        <option value="學術專案報告"
+                            data-struct="背景動機 → 目標設定 → 執行方法 → 成果展示 → 反思檢討"
+                            data-note="強調過程記錄與可重現性，適合課程專題或實驗性研究">學術專案報告</option>
+                        <option value="專題研討會"
+                            data-struct="議題導入 → 多方觀點 → 深度分析 → 討論互動 → 共識結論"
+                            data-note="互動性強，每頁設計引導提問，預留討論空間">專題研討會</option>
+                        <option value="期末成果展演"
+                            data-struct="任務說明 → 執行歷程 → 成果展示 → 困難與突破 → 學習心得"
+                            data-note="注重視覺衝擊與成果亮點，適合評審快速瀏覽">期末成果展演</option>
+                    </optgroup>
+                    <optgroup label="── 商業 / 企業 ──">
+                        <option value="商業提案企劃"
+                            data-struct="問題定義 → 市場分析 → 解決方案 → 商業模式 → 財務預測 → 執行計畫"
+                            data-note="以說服決策者為目標，數據驅動，每頁一個核心論點">商業提案企劃</option>
+                        <option value="產品發表會"
+                            data-struct="痛點共鳴 → 產品亮點 → 功能演示 → 市場定位 → 購買行動"
+                            data-note="視覺先行，文字極簡，強調情感共鳴與使用者故事">產品發表會</option>
+                        <option value="專案進度匯報"
+                            data-struct="目標回顧 → 本期成果 → 指標數據 → 風險與阻礙 → 下期計畫"
+                            data-note="聚焦關鍵指標，用數字說話，時間軸對比呈現進度">專案進度匯報</option>
+                    </optgroup>
+                    <optgroup label="── 教育 / 培訓 ──">
+                        <option value="教育訓練課程"
+                            data-struct="學習目標 → 概念建立 → 案例示範 → 實作練習 → 重點回顧"
+                            data-note="學習者中心設計，每單元有明確學習目標，圖解優先於文字">教育訓練課程</option>
+                    </optgroup>
+                    <optgroup label="── 生活 / 規劃 ──">
+                        <option value="旅遊規劃"
+                            data-struct="目的地介紹 → 行程總覽 → 每日安排 → 預算分配 → 注意事項"
+                            data-note="圖文並茂，地圖視覺化，時間軸清晰，適合輕鬆活潑風格">旅遊規劃</option>
+                    </optgroup>
+                </select>
             </div>
         </div>
 
+        <!-- 行2：次標題 + 報告人 + 類型說明卡 -->
+        <div class="form-group">
+            <label>次標題 <span class="label-sub">(學校 / 系級)</span></label>
+            <input type="text" id="report-subtitle" value="健行科技大學 進二技 工管三甲">
+        </div>
+        <div class="form-group">
+            <label>報告人 <span class="label-sub">(組別)</span></label>
+            <input type="text" id="report-group" value="第六小組">
+        </div>
         <div>
-            <div class="form-group">
-                <label>簡報類型</label>
-                <select id="report-type">
-                    <option value="學術專案報告">學術專案報告</option>
-                    <option value="論文發表" selected>論文發表</option>
-                    <option value="商業提案企劃">商業提案企劃</option>
-                    <option value="期末成果展演">期末成果展演</option>
-                    <option value="產品發表會">產品發表會</option>
-                    <option value="專題研討會">專題研討會</option>
-                    <option value="教育訓練課程">教育訓練課程</option>
-                    <option value="專案進度匯報">專案進度匯報</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>簡報頁數</label>
-                <div class="stepper-wrap">
-                    <div class="stepper">
-                        <button type="button" class="step-btn" onclick="step('report-pages',-5,5)">−</button>
-                        <input type="number" id="report-pages" value="20" min="5" step="5">
-                        <button type="button" class="step-btn" onclick="step('report-pages',5,5)">+</button>
+            <div class="combo-info-card" id="rtype-info-card">
+                <div class="combo-info-header">
+                    <span class="combo-info-badge badge-type">簡報類型</span>
+                    <span class="combo-info-title" id="rtype-info-title">論文發表</span>
+                </div>
+                <div class="combo-info-body">
+                    <div style="margin-bottom:4px;">
+                        <strong>建議結構：</strong><span id="rtype-struct" style="color:#CFD8DC;">一、緒論　二、文獻探討　三、研究方法與設計　四、資料分析結果　五、結論與建議　※ 參考文獻</span>
                     </div>
-                    <span class="stepper-unit">頁</span>
+                    <div>
+                        <strong>設計重點：</strong><span id="rtype-note" style="color:#90A4AE;">嚴謹學術五章架構，每章對應一個論述層次，圖表以數據佐證為主，參考文獻置於末頁</span>
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label>報告時間</label>
-                <div class="stepper-wrap">
-                    <div class="stepper">
-                        <button type="button" class="step-btn" onclick="step('report-time',-5,5)">−</button>
-                        <input type="number" id="report-time" value="40" min="5" step="5">
-                        <button type="button" class="step-btn" onclick="step('report-time',5,5)">+</button>
-                    </div>
-                    <span class="stepper-unit">分鐘</span>
+        </div>
+
+        <!-- 行3：小組成員（跨3欄）-->
+        <div class="span-3 form-group">
+            <label>小組成員名單 <span class="label-sub">(選填，最多 12 人 · 輸入後按 Enter 或 , 新增 · 點 ✕ 移除)</span></label>
+            <div class="member-board" id="member-board" onclick="focusMemberInput()">
+                <input class="member-tag-input" id="member-input"
+                       placeholder="輸入姓名 學號，按 Enter 新增..."
+                       oninput="autoResizeInput(this)"
+                       onkeydown="onMemberKeyDown(event)">
+            </div>
+            <div style="margin-top:6px;">
+                <span style="font-size:12px;color:var(--text-dim);">共 <span id="member-count">0</span> 人</span>
+            </div>
+        </div>
+
+        <!-- 行4：簡報頁數 + 報告時間 + 報告場景 -->
+        <div class="form-group">
+            <label>簡報頁數</label>
+            <div class="stepper-wrap">
+                <div class="stepper">
+                    <button type="button" class="step-btn" onclick="step('report-pages',-5,5)">−</button>
+                    <input type="number" id="report-pages" value="20" min="5" step="5">
+                    <button type="button" class="step-btn" onclick="step('report-pages',5,5)">+</button>
                 </div>
+                <span class="stepper-unit">頁</span>
             </div>
-            <div class="form-group">
-                <label>報告場景</label>
-                <select id="report-scene">
-                    <option value="大型會議室投影（放大字級）" selected>大型會議室投影（放大字級）</option>
-                    <option value="小型會議室投影（標準字級）">小型會議室投影（標準字級）</option>
-                    <option value="教室投影（高對比大字級）">教室投影（高對比大字級）</option>
-                    <option value="演講廳大螢幕（超大字級）">演講廳大螢幕（超大字級）</option>
-                    <option value="線上視訊會議（螢幕優化）">線上視訊會議（螢幕優化）</option>
-                </select>
+        </div>
+        <div class="form-group">
+            <label>報告時間</label>
+            <div class="stepper-wrap">
+                <div class="stepper">
+                    <button type="button" class="step-btn" onclick="step('report-time',-5,5)">−</button>
+                    <input type="number" id="report-time" value="40" min="5" step="5">
+                    <button type="button" class="step-btn" onclick="step('report-time',5,5)">+</button>
+                </div>
+                <span class="stepper-unit">分鐘</span>
             </div>
-            <div class="form-group">
-                <label>簡報補充需求 <span class="label-sub">(選填)</span></label>
-                <textarea id="report-extra" rows="5" placeholder="特殊風格要求、視覺避諱、排版規則...">學號部分使用英文數字在首頁呈現，小組成員分成 2 列並排
-不要有英文詞彙，仔細檢查不要有錯字及模糊的字
-一頁一主題，案例說明部分要有案例要因分析、防範措施計畫、對應法規，所有內容均屬事實正確與來源相同不可杜撰</textarea>
+        </div>
+        <div class="form-group">
+            <label>報告場景</label>
+            <select id="report-scene">
+                <option value="大型會議室投影（放大字級）" selected>大型會議室投影（放大字級）</option>
+                <option value="小型會議室投影（標準字級）">小型會議室投影（標準字級）</option>
+                <option value="教室投影（高對比大字級）">教室投影（高對比大字級）</option>
+                <option value="演講廳大螢幕（超大字級）">演講廳大螢幕（超大字級）</option>
+                <option value="線上視訊會議（螢幕優化）">線上視訊會議（螢幕優化）</option>
+            </select>
+        </div>
+
+    </div><!-- /grid-3c -->
+
+    <!-- ══ 進階輸出選項 ══ -->
+    <div class="advanced-panel">
+        <button type="button" class="advanced-toggle" id="adv-toggle" onclick="toggleAdvanced()">
+            <span class="toggle-arrow">▾</span>
+            進階輸出選項
+        </button>
+        <div class="advanced-body" id="adv-body">
+            <div class="adv-grid-3">
+                <div>
+                    <label>簡報補充需求 <span class="label-sub">(選填 · 不需要的內容可直接刪除)</span></label>
+                    <textarea id="report-extra" rows="4" placeholder="特殊風格要求、視覺避諱、排版規則...">學號部分使用英文數字在首頁呈現，小組成員分成 2 列並排
+案例說明部分要有案例要因分析、防範措施計畫、對應法規
+一頁一主題，仔細檢查不要有錯字及模糊的字
+所有內容均屬事實正確與來源相同不可杜撰</textarea>
+                </div>
+                <div>
+                    <label>禁止項目 <span class="label-sub">(選填，注入至約束條件)</span></label>
+                    <textarea id="extra-ban" rows="4" placeholder="例：不要出現英文、不要使用漸層背景">不要有英文詞彙</textarea>
+                </div>
+                <div>
+                    <label>額外視覺氛圍強化
+                        <span class="label-sub">(選填 · 僅強化現有風格，不覆蓋色調)</span>
+                    </label>
+                    <div class="combo-select-wrap" style="margin-bottom:8px;">
+                        <select id="extra-draw-sel" onchange="onDrawEffectSelect()">
+                            <option value="" data-safe="true"
+                                data-desc="不加入任何額外視覺指令，完全依照風格模組設定輸出。">
+                                無（使用風格模組預設）
+                            </option>
+
+                            <optgroup label="── 靜態強化：形狀 · 材質 · 光照 ──">
+                                <option value="加深背景暗度，讓主視覺更突出，提高整體對比層次感" data-safe="true"
+                                    data-desc="🟦 靜態。加深背景暗度，讓前景 3D 物件更立體突出。✅ 適合所有風格，尤其強化深色系風格的立體感。不影響色調與動態元素。">
+                                    加深背景 · 提高對比層次
+                                </option>
+                                <option value="在背景加入極淡幾何光柵網格線條，線條透明度不超過 10%，不干擾主視覺" data-safe="true"
+                                    data-desc="🟦 靜態。極淡幾何光柵底紋，透明度低於 10%。✅ 與科技類、工業類風格最搭。強化空間深度，不引入新色彩。">
+                                    極淡光柵底紋 · 強化科技感
+                                </option>
+                                <option value="為所有 3D 主題物件加入更明顯的接觸陰影與環境遮蔽效果（SSAO），增強立體重量感" data-safe="true"
+                                    data-desc="🟦 靜態。強化 AO 環境遮蔽，讓 3D 物件更有重量感。✅ 適合所有含 3D 元素的風格，純粹提升渲染品質。">
+                                    強化 3D 陰影 · 增加立體重量感
+                                </option>
+                                <option value="為文字標題加入極細緻的金屬反光邊緣描邊，描邊色彩與主題演算色調保持一致" data-safe="true"
+                                    data-desc="🟦 靜態。標題金屬描邊沿用主題色，不引入新顏色。✅ 適合商業、學術、高端質感風格，靜態精緻感最強。">
+                                    標題金屬描邊 · 強化高端質感
+                                </option>
+                                <option value="為 3D 主題物件加入輕微表面菲涅耳反射效果，增強材質真實感，反射強度不超過 20%" data-safe="true"
+                                    data-desc="🟦 靜態。菲涅耳反射讓 3D 物件邊緣更真實。✅ 與「3D 擬真沉浸渲染」「玻璃擬真」材質最搭，強化物理真實感。">
+                                    3D 菲涅耳反射 · 強化材質真實感
+                                </option>
+                                <option value="在畫面加入極淡的大氣散射光霧效果，霧氣密度不超過 8%，讓遠景層次更豐富" data-safe="true"
+                                    data-desc="🟦 靜態。大氣散射光霧強化遠近景深，製造電影感空間層次。✅ 與 3D 電影、空間感風格最搭。">
+                                    大氣光霧效果 · 強化空間層次
+                                </option>
+                                <option value="為所有文字標籤加入輕微景深模糊漸層，距離視覺焦點越遠的文字越模糊，最大模糊半徑不超過 2px" data-safe="true"
+                                    data-desc="🟦 靜態。文字景深層次強化主視覺焦點，適合核心數據突出場景。✅ 適合簡報類、圖表類風格，不干擾主要資訊可讀性。">
+                                    文字景深模糊 · 強化焦點層次
+                                </option>
+                                <option value="在背景加入極細微的表面噪點紋理，噪點透明度不超過 6%，增加材質顆粒感" data-safe="true"
+                                    data-desc="🟦 靜態。細微噪點紋理強化表面質感，避免過於數位化的平滑感。✅ 與工業、電影、學術等有質感需求的風格相容。">
+                                    表面噪點紋理 · 強化材質顆粒感
+                                </option>
+                                <option value="為畫面加入輕微的暗角壓縮效果（Vignette），邊角透明度漸層壓暗 20%，讓視線自然向畫面中心集中" data-safe="true"
+                                    data-desc="🟦 靜態。暗角效果是電影攝影常用技法，讓視線自然收斂至中心。✅ 適合所有風格，尤其強化電影感與沉浸感。">
+                                    邊角暗角效果 · 集中視線焦點
+                                </option>
+                                <option value="為 3D 物件的高光反射區域加入輕微的 Bloom 溢光效果，溢光半徑不超過 5px，強度不超過 15%" data-safe="true"
+                                    data-desc="🟦 靜態。Bloom 溢光讓高光區域更真實發光，強化材質光澤感。✅ 與玻璃、金屬、全息等高反光材質最搭。">
+                                    高光溢光效果 · 強化材質光澤
+                                </option>
+                                <option value="在畫面添加輕微色差（Chromatic Aberration）效果，邊緣 RGB 分離距離不超過 1px" data-safe="true"
+                                    data-desc="🟦 靜態。極細微色差讓畫面更有攝影鏡頭質感。✅ 適合科幻、電影、3D 擬真風格，在靜態學術風格中請謹慎使用。">
+                                    輕微鏡頭色差 · 強化攝影質感
+                                </option>
+                                <option value="為畫面加入輕微的電影膠片暖調色彩分級，陰影偏藍，高光偏暖橘，對比度強化 10%" data-safe="true"
+                                    data-desc="🟦 靜態。電影色彩分級（Color Grading）讓整體色調更有層次感。✅ 最適合「3D 立體電影」「光影紀事」等電影感風格。在學術或商業風格中效果較微弱。">
+                                    電影色彩分級 · 強化光影層次
+                                </option>
+                                <option value="在文字標題下方加入輕微的毛玻璃霧化底板，背景模糊半徑不超過 12px，透明度 80%" data-safe="true"
+                                    data-desc="🟦 靜態。毛玻璃底板讓文字在複雜背景上保持高可讀性。✅ 適合所有 3D 擬真風格，特別強化現代 UI 質感。">
+                                    標題毛玻璃底板 · 強化可讀性
+                                </option>
+                                <option value="為畫面整體加入輕微的色相飽和度降低處理，飽和度降低 8%，讓色彩更沉穩高級" data-safe="true"
+                                    data-desc="🟦 靜態。輕微降低飽和度讓色彩更沉穩，避免過於鮮豔刺眼。✅ 與商業提案、學術期刊等正式場合風格最搭，減少視覺疲勞。">
+                                    輕微去飽和 · 強化沉穩高級感
+                                </option>
+                                <option value="為 3D 場景加入極遠景的星空深邃背景層，透明度不超過 10%，不干擾主視覺層" data-safe="true"
+                                    data-desc="🟦 靜態。極淡遠景星空強化場景縱深感，不干擾主視覺。✅ 適合「3D 擬真」「星雲幽冥」「暗黑霓虹」等深色系風格。">
+                                    極遠景星空 · 強化場景縱深
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="── 動態強化：光效 · 粒子 · 運動 ──">
+                                <option value="在畫面邊緣加入極淡體積光暈效果，光暈色彩與主題演算色調保持一致，透明度不超過 15%" data-safe="true"
+                                    data-desc="🟡 動態。邊緣體積光暈沿用主題演算色，不引入新顏色，強化沉浸感。✅ 與 3D 電影、星雲、晶澈凝光風格最搭。">
+                                    邊緣體積光暈 · 強化沉浸感
+                                </option>
+                                <option value="在背景加入極稀疏的微小粒子飄散效果，粒子色彩與主題演算色調保持一致，粒子密度不超過整體畫面的 5%" data-safe="true"
+                                    data-desc="🟡 動態。粒子效果沿用主題色，輕微點綴空間。✅ 與「暗黑霓虹」「星雲幽冥」「數據流光」科技類風格最搭，不適合靜態學術風格。">
+                                    微粒子飄散 · 動態科技感
+                                </option>
+                                <option value="在 3D 主題物件表面加入極緩慢的光線掃描效果，掃描光帶與主題演算色調保持一致，掃描週期不短於 8 秒" data-safe="true"
+                                    data-desc="🟡 動態。極緩慢光掃讓 3D 物件更有生命感，週期緩慢不干擾視線。✅ 適合「智慧科技藍」「數據流光」「暗黑霓虹」等工業科技風格。">
+                                    動態光掃效果 · 強化科技生命感
+                                </option>
+                                <option value="在背景加入極淡的景深模糊效果，模糊強度不超過 5%，僅作用於背景遠景層，前景保持清晰" data-safe="true"
+                                    data-desc="🟡 動態。景深模糊強化電影感，前景保持完全清晰。✅ 與「3D 電影」「3D 沉浸渲染」風格最搭，不適合資訊密度高的財務報表類型。">
+                                    背景景深模糊 · 強化電影感
+                                </option>
+                                <option value="為主題演算色調的高光區域加入輕微的光芒放射效果，光芒長度不超過 20px，透明度不超過 12%" data-safe="true"
+                                    data-desc="🟡 動態。光芒放射讓高光點更有能量感，強化視覺焦點。✅ 適合「3D 擬真」「晶澈凝光」「星雲幽冥」等強光感風格。">
+                                    高光光芒放射 · 強化視覺焦點
+                                </option>
+                                <option value="在 3D 物件底部加入極淡的地面反射效果，反射透明度不超過 15%，模糊半徑不超過 10px" data-safe="true"
+                                    data-desc="🟡 動態。地面反射讓 3D 物件更有真實存在感，強化與場景的連結。✅ 與所有 3D 擬真風格相容，特別強化工業、電影類風格的真實感。">
+                                    地面反射效果 · 強化 3D 真實感
+                                </option>
+                                <option value="為 3D 場景加入輕微的攝影機呼吸效果（Breathing Effect），畫面極緩慢地微幅縮放，縮放幅度不超過 0.5%，週期不短於 10 秒" data-safe="true"
+                                    data-desc="🟡 動態。極緩慢攝影機呼吸讓靜態畫面有細微生命感，觀眾不易察覺但整體更生動。✅ 適合所有風格，特別強化沉浸感與電影感。">
+                                    攝影機呼吸效果 · 強化沉浸生命感
+                                </option>
+                                <option value="在畫面主視覺加入輕微的光線折射稜鏡邊緣效果，折射強度不超過 8%，僅出現在強光源周圍" data-safe="true"
+                                    data-desc="🟡 動態。稜鏡折射在強光源周圍產生光學色散效果。✅ 適合「晶澈凝光」「暗黑霓虹」「星雲幽冥」等強光感風格，內斂風格請謹慎。">
+                                    稜鏡折射邊緣 · 強化光感
+                                </option>
+                                <option value="為背景加入極緩慢的雲霧流動效果，霧氣移動速度極緩，每秒位移不超過 2px，透明度不超過 8%" data-safe="true"
+                                    data-desc="🟡 動態。極緩慢霧氣流動讓背景有空間流動感，不干擾主視覺。✅ 與「煙波微茫」「雲煙青綠」「3D 電影」等有空間深度的風格最搭。">
+                                    背景霧氣流動 · 強化空間流動感
+                                </option>
+                                <option value="為 3D 物件的高光點加入極細微的閃爍效果，閃爍頻率低於每 3 秒一次，強度不超過 10%" data-safe="true"
+                                    data-desc="🟡 動態。極低頻的閃爍讓高光點有生命感，不造成視覺干擾。✅ 適合「金屬材質」「晶體」「全息投影」等反光材質的風格。">
+                                    高光點微閃效果 · 強化材質生命感
+                                </option>
+                                <option value="在 3D 場景中加入極緩慢旋轉的攝影機環繞效果，每圈旋轉時間不短於 60 秒，旋轉半徑極小" data-safe="true"
+                                    data-desc="🟡 動態。極緩慢攝影機微旋轉讓靜態 3D 場景產生立體感，是最沉浸的動態效果之一。✅ 適合「3D 擬真電影」「3D 沉浸渲染」等高品質 3D 風格，靜態學術類不建議。">
+                                    攝影機極緩環繞 · 最強 3D 沉浸感
+                                </option>
+                                <option value="為背景加入極稀疏的閃爍星點效果，每個星點閃爍週期不短於 5 秒，密度不超過畫面的 3%，色彩與主題演算色調保持一致" data-safe="true"
+                                    data-desc="🟡 動態。極低密度閃爍星點讓背景有深邃宇宙感，沿用主題色不引入新顏色。✅ 適合「星雲幽冥」「3D 擬真」「暗黑霓虹」等深色系風格。">
+                                    背景星點閃爍 · 強化深邃宇宙感
+                                </option>
+                                <option value="為主題演算色調區域加入極緩慢的色相偏移效果，色相偏移角度不超過 10 度，週期不短於 15 秒" data-safe="true"
+                                    data-desc="🟡 動態。極緩慢的色相微偏移讓主題色調有細微的生命呼吸感。✅ 適合「星雲幽冥」「晶澈凝光」等色彩豐富的風格，商業和學術風格請謹慎。">
+                                    色相呼吸偏移 · 強化色彩生命感
+                                </option>
+                                <option value="在畫面添加極淡的電子雜訊掃描線效果（Scan Lines），掃描線間距不小於 4px，透明度不超過 6%" data-safe="true"
+                                    data-desc="🟡 動態。電子掃描線強化 CRT 復古科技感或未來主義風格。✅ 適合「賽博龐克」「暗黑霓虹」「復古雷達」等科技類風格，學術和商業風格不建議。">
+                                    電子掃描線效果 · 強化科技感
+                                </option>
+                                <option value="為 3D 場景中的光源加入極細微的光暈鏡頭光斑（Lens Flare）效果，光斑透明度不超過 12%，僅在主光源位置出現" data-safe="true"
+                                    data-desc="🟡 動態。鏡頭光斑讓場景有電影攝影機拍攝的真實感。✅ 與「3D 擬真電影」「光影紀事」「晶澈凝光」等強調光影的風格最搭。">
+                                    鏡頭光斑效果 · 強化電影攝影感
+                                </option>
+                            </optgroup>
+
+                            <optgroup label="── 🟠 東方中國風：水墨禪意氛圍 ──">
+                                <option value="在背景加入極淡的宣紙暈染紋理效果，紋理透明度不超過 10%，色調與主題演算色調保持和諧"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。宣紙暈染底紋營造水墨意境，不干擾主視覺。✅ 與「水墨暈染」「宣紙留白」「山水潑墨」等東方水墨風格完美搭配，其他風格慎用。">
+                                    宣紙暈染底紋 · 水墨意境
+                                </option>
+                                <option value="為 3D 主題物件邊緣加入極淡的水墨飛濺效果，飛濺面積不超過物件輪廓的 15%，色彩沿用主題演算色調"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。水墨飛濺讓 3D 物件與東方意境融合，強化筆觸感。✅ 適合「水墨暈染」「荷花禪境」「梅蘭竹菊」等東方風格，科技感風格不建議。">
+                                    水墨飛濺邊緣 · 強化筆觸感
+                                </option>
+                                <option value="在畫面遠景加入極淡的竹影搖曳效果，竹影透明度不超過 8%，竹影顏色與主題演算色調保持一致"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。竹影遠景強化自然禪意，沿用主題色不引入新顏色。✅ 最適合「竹韻」「荷境」「禪境」等名詞模組搭配的東方風格。">
+                                    竹影搖曳遠景 · 強化禪意自然感
+                                </option>
+                                <option value="在畫面加入極淡的荷花倒影效果，倒影透明度不超過 10%，僅出現在畫面下方三分之一區域"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。荷花倒影強化水面靜謐感，置於下方不干擾主視覺。✅ 與「荷境」「荷花禪境」「雲海」等意境類選項完美搭配。">
+                                    荷花倒影點綴 · 強化靜謐水意
+                                </option>
+                                <option value="在背景遠景加入極淡的山水雲霧層疊效果，霧氣透明度不超過 12%，形成前景、中景、遠山三層縱深"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。三層山水縱深強化空間層次感，是東方水墨最具代表性的構圖技法。✅ 適合「山水」「雲海」「煙嵐」等名詞模組，搭配水墨暈染或宣紙留白風格。">
+                                    山水雲霧縱深 · 強化層疊空間感
+                                </option>
+                                <option value="為文字標題和關鍵數字加入極細微的金箔描邊點綴，金箔色彩為傳統鎏金色（#C9A84C），透明度不超過 20%"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。鎏金描邊強化高貴典雅的宮廷感。✅ 適合「金箔描繪」「黑曜鎏金」「古銅鑄刻」等帶有金屬質感的東方或高端風格。">
+                                    鎏金標題描邊 · 強化典雅宮廷感
+                                </option>
+                                <option value="在畫面邊角加入極淡的朱砂印章效果，印章透明度不超過 15%，印章位置在右下角，強化傳統書畫落款感"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。朱砂印章是中國書畫的落款傳統，強化作品完整感與文化意蘊。✅ 適合所有東方水墨風格，在科技感或現代簡約風格中請謹慎使用。">
+                                    朱砂印章落款 · 強化書畫完整感
+                                </option>
+                                <option value="為背景加入極淡的青花瓷纏枝紋樣底紋，紋樣透明度不超過 8%，色彩僅使用傳統青花藍（#2B4FA5）"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。青花瓷纏枝紋是最具辨識度的中國傳統紋樣，強化器物美學感。✅ 適合「青花瓷藍」「靛青藍」色調模組，搭配「古樸」「雅致」形容詞效果最佳。">
+                                    青花瓷纏枝底紋 · 強化器物美學
+                                </option>
+                                <option value="在 3D 主題物件周圍加入極淡的氤氳氣韻流動效果，氣韻色彩與主題演算色調保持一致，流動速度極緩慢，週期不短於 12 秒"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。氤氳氣韻讓 3D 物件與東方哲學意境連結，強化「氣」的流動感。✅ 與「氤氳」「氣韻」「禪意」「飄逸」等東方形容詞模組最搭。">
+                                    氤氳氣韻流動 · 強化哲學意境感
+                                </option>
+                                <option value="在畫面加入極淡的梅花或蘭草剪影遠景裝飾，剪影透明度不超過 8%，僅出現在畫面角落，不干擾主視覺中央區域"
+                                    data-safe="true"
+                                    data-desc="🟠 東方。梅蘭角落剪影是中國文人畫的常見構圖元素，強化書齋氣韻。✅ 適合「梅蘭竹菊」「山水潑墨」等植物意象的東方風格，搭配「清幽」「雅致」形容詞。">
+                                    梅蘭角落剪影 · 強化文人書齋感
+                                </option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <!-- 效果說明卡 -->
+                    <div class="combo-info-card" id="draw-effect-card">
+                        <div class="combo-info-header" id="draw-effect-header">
+                            <span class="combo-info-badge" id="draw-safe-badge" style="background:rgba(0,230,118,0.15);color:#69F0AE;border:1px solid rgba(0,230,118,0.3);">安全相容</span>
+                            <span class="combo-info-title" id="draw-effect-title">無（使用風格模組預設）</span>
+                        </div>
+                        <div class="combo-info-body">
+                            <span id="draw-effect-desc">不加入任何額外視覺指令，完全依照風格模組設定輸出。</span>
+                        </div>
+                    </div>
+                    <!-- 隱藏欄位，存放最終輸出文字 -->
+                    <input type="hidden" id="extra-draw" value="">
+                </div>
             </div>
         </div>
     </div>
@@ -721,12 +1295,63 @@
 /* ════════════════════════════════════
    資料庫
 ════════════════════════════════════ */
-const dataAdj = ["無","智慧","科幻","沉穩","動態","極簡","奢華","賽博","物理","幾何","仿生","虛擬","粒子","全息","脈衝","鏡面","流體","裝甲","晶體","奈米","磁力","量子","重力","光速","星際","折射","霧面","透光","懸浮","聲波","機甲"];
-const dataColor = ["無","科技藍","霓虹紫","熔岩橘","翡翠綠","深空黑","鈦金灰","珍珠白","玫瑰金","香檳黃","琥珀棕","冰川藍","螢光綠","晚霞紅","曜石黑","琉璃青","珊瑚粉","蒼穹藍","莫蘭迪灰","金屬銀","迷幻彩","瑪瑙紅","星塵紫","隕石灰","極光綠","晨曦黃","深海藍","幻影黑","鐳射銀","玫瑰紅","鈷青藍"];
-const dataNoun = ["矩陣","核心","介面","儀表","視界","空間","晶體","節點","模組","系統","中樞","迴路","引擎","面板","終端","網路","伺服","雲端","數據","晶片","陣列","指令","視窗","虛空","屏障","軌道","光柵","質點","頻譜","宇宙"];
-const dataType = ["數據分析","流程圖解","組織架構","時間軸","產品比較","地理分佈","概念解構","趨勢預測","財務報表","風險評估","戰略藍圖","生態系統","效能監控","用戶旅程","資源分配","供應鏈條","生命週期","演算法架構","關聯矩陣","熱力分佈","雷達維度","漏斗轉化","階層拓撲","流向桑基","里程碑","魚骨分析","樹狀節點","散點集群","核心樞紐","儀表總覽"];
-const dataChartStyle = ["玻璃擬真","金屬拉絲","發光全息","黏土立體","壓克力透視","霓虹光管","低多邊形","賽博龐克","工業鑄造","陶瓷溫潤","碳纖維感","光柵折射","水晶剔透","幾何切割","復古雷達","液晶點陣","浮雕刻字","絲絨柔光","冰塊透鏡","液態金屬","星雲粒子","流體漸層","電路板蝕刻","毛玻璃","黑曜石","鈦金屬","全息投影","暗黑螢光","量子糾纏","光影幾何"];
-const dataLayout = ["網格陣列","放射擴散","階梯遞進","自由浮動","聚焦中心","左右對比","螺旋引導","卡片堆疊","上下分層","軌道環繞","黃金比例","蜂巢拼接","瀑布流","交錯拼圖","同心圓環","時間齒輪","對稱鏡像","金字塔","矩陣模塊","星系軌道","立體魔方","多維交疊","漏斗收斂","樹狀分支","波浪起伏","環環相扣","放射射線","錯落鑲嵌","八卦陣列","平行軌道"];
+// 形容詞模組（60 種｜靜態25＋動態25＋東方10）
+const dataAdj = [
+    "無",
+    {__cat:"── 靜態：沉穩固定的視覺屬性 ──", __type:"static"},
+    "沉穩","極簡","奢華","物理","幾何","仿生","鏡面","霧面","透光","晶體",
+    "折射","裝甲","磁力","重力","懸浮","星際","機甲","古典","工業","銳利",
+    "壓縮","精密","冷凝","礦物","熔鑄",
+    {__cat:"── 動態：流動變化的視覺屬性 ──", __type:"dynamic"},
+    "智慧","科幻","動態","賽博","虛擬","粒子","全息","脈衝","奈米","量子",
+    "光速","流體","聲波","裂變","聚變","躍遷","弦化","晶格","碎星","霓虹",
+    "幽能","靈能","超凡","異能","共振",
+    {__cat:"── 東方中國風：詩意古典意境 ──", __type:"oriental"},
+    "水墨","潑彩","禪意","古樸","飄逸","蒼勁","雅致","清幽","氤氳","氣韻"
+];
+// 色調模組（60 種｜靜態25＋動態25＋東方10）
+const dataColor = [
+    "無",
+    {__cat:"── 靜態：沉穩質感色系 ──", __type:"static"},
+    "深空黑","曜石黑","鈦金灰","隕石灰","珍珠白","莫蘭迪灰","幻影黑","鐵灰","煙燻棕","暗沉銅",
+    "琥珀棕","玫瑰金","晚霞紅","瑪瑙紅","玫瑰紅","珊瑚粉","香檳黃","晨曦黃","翡翠綠","蒼翠綠",
+    "冰川藍","蒼穹藍","深海藍","琉璃青","鈷青藍",
+    {__cat:"── 動態：高能發光色系 ──", __type:"dynamic"},
+    "科技藍","霓虹紫","熔岩橘","螢光綠","金屬銀","迷幻彩","星塵紫","極光綠","鐳射銀",
+    "電漿青","量子藍","裂焰橙","核能綠","暗能紫","反物質黑","反射白","脈衝紅","光速金",
+    "折射彩","超頻藍","過載紫","炙熔橘","爆炸黃","共鳴青","奇點白",
+    {__cat:"── 東方中國風：傳統礦物色系 ──", __type:"oriental"},
+    "朱砂紅","石青藍","墨黑","宣紙白","赭石棕","藤黃金","石綠","胭脂粉","靛青藍","緗色黃"
+];
+// 名詞模組（60 種｜靜態25＋動態25＋東方10）
+const dataNoun = [
+    {__cat:"── 靜態：形體空間類 ──", __type:"static"},
+    "核心","空間","視界","晶體","模組","面板","終端","軌道","光柵","屏障",
+    "結構","架構","基底","層次","界面","邊際","稜鏡","幾何","節理","石板",
+    "場域","地帶","疆域","岩脈","骨架",
+    {__cat:"── 動態：系統運算類 ──", __type:"dynamic"},
+    "矩陣","介面","儀表","節點","系統","中樞","迴路","引擎","網路","伺服",
+    "雲端","數據","晶片","陣列","指令","視窗","虛空","質點","頻譜","宇宙",
+    "波動","脈流","電磁","渦流","奇點",
+    {__cat:"── 東方中國風：自然意境類 ──", __type:"oriental"},
+    "山水","竹韻","荷境","雲海","墨痕","煙嵐","丹青","篆意","禪境","錦繡"
+];
+// 圖表視覺風格（50 種｜科技感、材質感、東方水墨三大類）
+const dataChartStyle = [
+    {__cat:"── 科技感：光效、數位、未來 ──", __type:"dynamic"},
+    "玻璃擬真","發光全息","霓虹光管","賽博龐克","液晶點陣","電路板蝕刻",
+    "量子糾纏","暗黑螢光","全息投影","光柵折射","光影幾何","流體漸層",
+    "星雲粒子","復古雷達","低多邊形",
+    {__cat:"── 材質感：物理、質地、工藝 ──", __type:"static"},
+    "金屬拉絲","碳纖維感","鈦金屬","黑曜石","工業鑄造","毛玻璃",
+    "壓克力透視","冰塊透鏡","水晶剔透","液態金屬","黏土立體","陶瓷溫潤",
+    "絲絨柔光","浮雕刻字","幾何切割",
+    {__cat:"── 東方水墨：中國風、禪意、古典 ──", __type:"static"},
+    "水墨暈染","宣紙留白","青花瓷藍","朱砂硃紅","金箔描繪","竹簡刻紋",
+    "荷花禪境","山水潑墨","雲霧飄渺","梅蘭竹菊","敦煌壁畫","漢代篆刻",
+    "龍紋祥雲","古銅鑄刻","碧玉翡翠","鈞瓷窯變","剪紙鏤空","藍染靛青",
+    "楠木年輪","琺瑯彩繪"
+];
 
 const themeAdjectives = ["量子","賽博","全息","脈衝","奈米","磁暴","虛擬","仿生","矩陣","核心","幾何","光速","粒子","星際","異星","幻影","沉浸","動態","重力","裂變","聚變","躍遷","弦化","晶格","碎星","霓虹","幽能","靈能","超凡","異能"];
 const themeNouns = {
@@ -741,15 +1366,33 @@ const themeNouns = {
 };
 
 /* ════════════════════════════════════
-   自訂選單初始化
+   自訂選單初始化（支援分類標題）
 ════════════════════════════════════ */
+// 通用版：dataArray 可以是 string[] 或 {cat, items}[] 混合
 function initSelect(elementId, dataArray, defaultVal) {
     const wrapper     = document.getElementById(elementId);
     const box         = wrapper.querySelector('.select-box');
     const grid        = wrapper.querySelector('.options-grid');
     const hiddenInput = wrapper.querySelector('input[type="hidden"]');
 
+    // 靜態/動態分類支援：在 dataArray 中插入特殊標記物件
+    // 格式：{__cat: '靜態', __type: 'static'} 或純字串
     dataArray.forEach(item => {
+        if (item && typeof item === 'object' && item.__cat) {
+            // 分類標題行
+            const cat = document.createElement('div');
+            cat.className = `option-cat`;
+            // 色碼：靜態綠、動態黃、東方紅
+            const c = item.__type === 'static'   ? '#69F0AE'
+                    : item.__type === 'dynamic'  ? '#FFD740'
+                    : item.__type === 'oriental' ? '#FF8A65'   // 東方磚紅
+                    : 'var(--text-dim)';
+            cat.style.color       = c;
+            cat.style.borderColor = c + '44';
+            cat.textContent = item.__cat;
+            grid.appendChild(cat);
+            return;
+        }
         const div = document.createElement('div');
         div.className = 'option-item';
         div.textContent = item;
@@ -758,10 +1401,8 @@ function initSelect(elementId, dataArray, defaultVal) {
         }
         div.addEventListener('click', e => {
             e.stopPropagation();
-            // 清除舊選中
             grid.querySelectorAll('.option-item').forEach(d => d.classList.remove('selected'));
             div.classList.add('selected');
-
             const display = item === "無" ? "無（點擊展開）" : item;
             box.textContent = display;
             hiddenInput.value = item === "無" ? "" : item;
@@ -774,12 +1415,250 @@ function initSelect(elementId, dataArray, defaultVal) {
 
     box.addEventListener('click', e => {
         e.stopPropagation();
-        // 關閉其他選單
         document.querySelectorAll('.options-grid').forEach(g => {
             if (g !== grid) {
                 g.classList.remove('show');
                 g.closest('.custom-select').querySelector('.select-box').classList.remove('open');
             }
+        });
+        const isOpen = grid.classList.toggle('show');
+        box.classList.toggle('open', isOpen);
+    });
+}
+
+// 圖表類型專用（帶 data-flow 屬性）
+function initTypeSelect() {
+    // 50 種圖表類型，依動線類別分組
+    const typeData = [
+        // ── Z 字型動線 ──
+        {__cat:"── Z 字型動線：線性序列、步驟流程 ──", __type:"z"},
+        { val:"流程圖解",   flow:"Z字型動線", desc:"視線左上→右→斜左下→右下，符合步驟先後順序" },
+        { val:"時間軸",     flow:"Z字型動線", desc:"強制線性時序，動線唯一合理選擇" },
+        { val:"戰略藍圖",   flow:"Z字型動線", desc:"從願景出發，Z 型串接策略、行動、成效" },
+        { val:"用戶旅程",   flow:"Z字型動線", desc:"從認知→興趣→行動，Z 型貼合線性旅程結構" },
+        { val:"供應鏈條",   flow:"Z字型動線", desc:"從原料→製造→配送，Z 型串接供應鏈各節點" },
+        { val:"演算法架構", flow:"Z字型動線", desc:"輸入→處理→輸出，Z 型貼合運算流向" },
+        { val:"流向桑基",   flow:"Z字型動線", desc:"能量從左源頭流向右目的地，Z 型水平流動" },
+        { val:"里程碑",     flow:"Z字型動線", desc:"時間線從左至右，Z 型串接各里程碑事件" },
+        { val:"事件時序",   flow:"Z字型動線", desc:"歷史事件或專案節點依時序 Z 型展開" },
+
+        // ── F 字型動線 ──
+        {__cat:"── F 字型動線：數據掃描、報表分析 ──", __type:"f"},
+        { val:"數據分析",   flow:"F字型動線", desc:"視線橫掃頂部→中段→左側縱讀，適合多欄並列數字" },
+        { val:"財務報表",   flow:"F字型動線", desc:"最重要指標置頂，左側為主軸數字，右下為附註" },
+        { val:"效能監控",   flow:"F字型動線", desc:"頂部警示指標最重要，視線逐層掃描細節數據" },
+        { val:"資源分配",   flow:"F字型動線", desc:"總量橫列頂部，各子項逐行向下分配比例" },
+        { val:"關聯矩陣",   flow:"F字型動線", desc:"X軸橫掃×Y軸縱讀，F 型符合矩陣掃描習慣" },
+        { val:"熱力分佈",   flow:"F字型動線", desc:"視線被高熱區吸引，通常分佈在頂部與左側" },
+        { val:"散點集群",   flow:"F字型動線", desc:"視線先掃頂部高值群，再逐層向右下方瀏覽次要群" },
+        { val:"儀表總覽",   flow:"F字型動線", desc:"關鍵 KPI 置頂橫排，次要指標逐行向下排列" },
+        { val:"比較表格",   flow:"F字型動線", desc:"多列多欄資料，F 型橫掃逐行比較各欄數值" },
+
+        // ── 放射型動線 ──
+        {__cat:"── 放射型動線：中心擴散、關係樹狀 ──", __type:"radial"},
+        { val:"組織架構",   flow:"放射型動線", desc:"視線從中心主管向四周部門輻射展開" },
+        { val:"概念解構",   flow:"放射型動線", desc:"核心概念置中，子議題均勻輻射，強化聚焦感" },
+        { val:"雷達維度",   flow:"放射型動線", desc:"各維度從中心向外放射，視線沿軸順時針環掃" },
+        { val:"階層拓撲",   flow:"放射型動線", desc:"根節點居中向葉節點放射，層級越深越外圍" },
+        { val:"魚骨分析",   flow:"放射型動線", desc:"原因從四方向主軸聚焦，視線從魚骨末端向脊骨收斂" },
+        { val:"樹狀節點",   flow:"放射型動線", desc:"根節點向子節點放射，視線沿分支逐層擴散" },
+        { val:"核心樞紐",   flow:"放射型動線", desc:"核心節點居中，連接節點向外輻射，強化中心感" },
+        { val:"心智地圖",   flow:"放射型動線", desc:"主題居中，聯想分支向四周自由擴散" },
+        { val:"影響力圖",   flow:"放射型動線", desc:"核心因素置中，各影響路徑向外輻射標示強弱" },
+
+        // ── 對角線動線 ──
+        {__cat:"── 對角線動線：趨勢對比、成長張力 ──", __type:"diagonal"},
+        { val:"趨勢預測",   flow:"對角線動線", desc:"左下起點↗右上目標，對角方向感強調成長軌跡" },
+        { val:"產品比較",   flow:"對角線動線", desc:"左上強項↘右下弱項，對角張力強化對比感" },
+        { val:"地理分佈",   flow:"F字型動線",  desc:"視線橫掃地圖頂部→逐層向下瀏覽各區" },
+        { val:"成長曲線",   flow:"對角線動線", desc:"從左下基準點↗右上高峰，對角線勾勒增長幅度" },
+        { val:"二維象限",   flow:"對角線動線", desc:"四象限中，視線沿對角線從最差↘最佳移動" },
+        { val:"差異對比",   flow:"對角線動線", desc:"舊版本↘新版本，對角線清楚展示前後差異" },
+        { val:"SWOT分析",   flow:"對角線動線", desc:"優勢↘機會、劣勢↗威脅，對角線強化戰略意涵" },
+
+        // ── 層疊型動線 ──
+        {__cat:"── 層疊型動線：優先序、收斂篩選 ──", __type:"stacked"},
+        { val:"風險評估",   flow:"層疊型動線", desc:"高風險置頂大格，越往下風險越低，形成優先序" },
+        { val:"漏斗轉化",   flow:"層疊型動線", desc:"強制層疊收斂，漏斗結構的唯一合理動線" },
+        { val:"優先序列",   flow:"層疊型動線", desc:"最高優先層最大、最顯眼，由上到下逐層收縮" },
+        { val:"KPI瀑布",    flow:"層疊型動線", desc:"累計值由上往下堆疊，清楚呈現各項目貢獻量" },
+        { val:"決策樹",     flow:"層疊型動線", desc:"由上向下逐層分岔，每層代表一個決策節點" },
+
+        // ── 環形動線 ──
+        {__cat:"── 環形動線：循環回饋、生命週期 ──", __type:"circular"},
+        { val:"生命週期",   flow:"環形動線",   desc:"強制環形，週期結構無起點無終點" },
+        { val:"生態系統",   flow:"環形動線",   desc:"各角色循環互依，無明確起點強調共存關係" },
+        { val:"PDCA循環",   flow:"環形動線",   desc:"Plan→Do→Check→Act 四節點等權重循環" },
+        { val:"服務藍圖",   flow:"環形動線",   desc:"服務各環節首尾相連，強調整體體驗閉環" },
+        { val:"供需循環",   flow:"環形動線",   desc:"供給與需求相互驅動的循環回饋結構" },
+        { val:"價值鏈環",   flow:"環形動線",   desc:"原料→加工→行銷→售後→回收的封閉循環" },
+        { val:"雙迴環學習", flow:"環形動線",   desc:"單迴環修正行動、雙迴環修正假設，組織學習常用模型" },
+        { val:"生態鏈圖",   flow:"環形動線",   desc:"捕食、共生、競爭關係形成的生態循環網絡" },
+        { val:"碳循環圖",   flow:"環形動線",   desc:"碳素在大氣、海洋、生物體間的循環流動路徑" },
+        { val:"水循環圖",   flow:"環形動線",   desc:"蒸發→降水→地表流→滲透的自然循環完整閉環" },
+        { val:"知識管理圖", flow:"環形動線",   desc:"知識創造→整合→分享→應用→創新的循環架構" }
+    ];
+
+    const wrapper = document.getElementById('select-type');
+    const box     = wrapper.querySelector('.select-box');
+    const grid    = wrapper.querySelector('.options-grid');
+    const hidden  = wrapper.querySelector('input[type="hidden"]');
+
+    // 動線分類色碼
+    const catColors = { z:"#64B5F6", f:"#81C784", radial:"#FFB74D", diagonal:"#F06292", stacked:"#BA68C8", circular:"#4DD0E1" };
+
+    typeData.forEach(d => {
+        if (d.__cat) {
+            const cat = document.createElement('div');
+            cat.className = 'option-cat';
+            cat.textContent = d.__cat;
+            cat.style.color = catColors[d.__type] || 'var(--text-dim)';
+            cat.style.borderColor = (catColors[d.__type] || '#444') + '44';
+            grid.appendChild(cat);
+            return;
+        }
+        const div = document.createElement('div');
+        div.className = 'option-item';
+        div.textContent = d.val;
+        div.dataset.flow     = d.flow;
+        div.dataset.flowDesc = d.desc;
+        if (d.val === '數據分析') div.classList.add('selected');
+        div.addEventListener('click', e => {
+            e.stopPropagation();
+            grid.querySelectorAll('.option-item').forEach(x => x.classList.remove('selected'));
+            div.classList.add('selected');
+            box.textContent         = d.val;
+            hidden.value            = d.val;
+            hidden.dataset.flow     = d.flow;
+            hidden.dataset.flowDesc = d.desc;
+            grid.classList.remove('show');
+            box.classList.remove('open');
+            onTypeSelect();
+        });
+        grid.appendChild(div);
+    });
+    box.addEventListener('click', e => {
+        e.stopPropagation();
+        document.querySelectorAll('.options-grid').forEach(g => {
+            if (g !== grid) { g.classList.remove('show'); g.closest('.custom-select').querySelector('.select-box').classList.remove('open'); }
+        });
+        const isOpen = grid.classList.toggle('show');
+        box.classList.toggle('open', isOpen);
+    });
+}
+
+// 畫面佈局專用（帶 data-note 屬性）
+function initLayoutSelect() {
+    // 50 種畫面佈局，依空間特性分組
+    const layoutData = [
+        // ── 線性 / 序列 ──
+        {__cat:"── 線性 · 序列：適合 Z 字型、對角線動線 ──", __type:"linear"},
+        { val:"網格陣列",   note:"均勻矩形格狀排列，最通用。適合 F 字型掃描多欄並列數字" },
+        { val:"階梯遞進",   note:"元素由左下往右上階梯排列，搭配對角線動線強調成長感" },
+        { val:"左右對比",   note:"畫面垂直分割為左右兩區，適合 Before↔After 或雙方案對比" },
+        { val:"上下分層",   note:"畫面水平分割為上中下層，適合總分結構或三階段說明" },
+        { val:"平行軌道",   note:"多條平行線各自延伸，適合甘特圖、多產品線並排比較" },
+        { val:"瀑布流",     note:"元素自上而下連續流動，適合資金流向或時序連續變化展示" },
+        { val:"環環相扣",   note:"鏈狀連結，每個環節緊扣下一環，適合流程鏈或價值鏈" },
+        { val:"時間齒輪",   note:"齒輪咬合形式排列，強調各元素互相驅動的機械式連動" },
+        { val:"積木堆疊",   note:"方塊由下往上堆疊，適合累積值、期間貢獻量的視覺化" },
+
+        // ── 放射 / 中心 ──
+        {__cat:"── 放射 · 中心：適合放射型動線 ──", __type:"radial"},
+        { val:"放射擴散",   note:"元素從中心向外擴散分佈。注意：此為空間結構，勿與放射型動線混淆" },
+        { val:"聚焦中心",   note:"核心元素居中最大，周邊漸次縮小，適合核心訊息突出類圖表" },
+        { val:"星系軌道",   note:"核心元素居中，衛星沿橢圓軌道繞行，強調主從關係" },
+        { val:"軌道環繞",   note:"元素沿同心圓軌道排列，適合星系模型或關係層級圖" },
+        { val:"放射射線",   note:"射線從單一頂點向外輻射，比放射擴散更強調方向性" },
+        { val:"向心收斂",   note:"外圍元素向核心聚合，強調最終結論或核心價值" },
+        { val:"蜂巢拼接",   note:"六邊形緊密拼接，大量同等級項目的密集展示，無明顯動線" },
+        { val:"八卦陣列",   note:"八方位均勻分佈，適合八個維度同等重要的比較或羅盤式分析" },
+
+        // ── 層疊 / 深度 ──
+        {__cat:"── 層疊 · 深度：適合層疊型動線 ──", __type:"stacked"},
+        { val:"金字塔",     note:"三角形層疊由底到頂，適合優先序、數量遞減或頻率分布" },
+        { val:"漏斗收斂",   note:"由寬到窄逐層收束，適合轉換率、篩選流程；搭配層疊型動線最完整" },
+        { val:"矩陣模塊",   note:"模組化矩陣格狀，適合多維度交叉分析，如 SWOT、波士頓矩陣" },
+        { val:"卡片堆疊",   note:"多張卡片層疊或排列，適合步驟卡片或流程節點列表" },
+        { val:"樹狀分支",   note:"根節點向下或向外分支，適合決策樹、分類系統或組織層級" },
+        { val:"多維交疊",   note:"多個圓形或區域相互交疊，適合文氏圖、共有屬性或重疊關係" },
+        { val:"同心圓環",   note:"由內而外同心圓層疊，表達層次深淺或影響範圍大小" },
+        { val:"立體魔方",   note:"三維方塊形式排列，適合多維度數據的 3D 空間化展示" },
+        { val:"巢狀方框",   note:"方框層層包含，清楚呈現從大類到小類的層級歸屬關係" },
+
+        // ── 自由 / 有機 ──
+        {__cat:"── 自由 · 有機：適合放射型、F 字型動線 ──", __type:"organic"},
+        { val:"自由浮動",   note:"元素依資料權重自由分佈，無固定格線，適合概念地圖或情緒板" },
+        { val:"交錯拼圖",   note:"大小不一的元素交錯填充版面，適合新聞報導式或雜誌排版" },
+        { val:"錯落鑲嵌",   note:"大小不規則的塊狀錯落排列，適合創意拼貼或資訊密度不均展示" },
+        { val:"波浪起伏",   note:"元素沿波浪曲線排列，節奏感強，適合趨勢波動或情緒曲線" },
+        { val:"螺旋引導",   note:"元素沿螺旋路徑排列，引導視線旋轉深入，適合故事性圖表" },
+        { val:"有機網絡",   note:"節點與連線自由分佈，強調複雜多點關係網路，無方向性約束" },
+        { val:"氣泡群組",   note:"大小不等的圓形泡泡聚群，適合以面積表達數量或比重的資料" },
+        { val:"散落分佈",   note:"點狀資料自然散佈在畫面中，以密度或顏色表達分布特徵" },
+
+        // ── 環形 / 循環 ──
+        {__cat:"── 環形 · 循環：適合環形動線 ──", __type:"circular"},
+        { val:"對稱鏡像",   note:"左右或上下完全對稱，適合均衡對比或雙系統比較，靜態安穩感強" },
+        { val:"時間輪盤",   note:"12 等分或自訂分割的圓形時鐘式佈局，適合週期性資料展示" },
+        { val:"迴圈箭頭",   note:"箭頭首尾相連形成圓形迴路，適合 PDCA、持續改善等循環流程" },
+        { val:"環狀流向",   note:"元素沿環形路徑順時針或逆時針排列，強調流動方向與循環節奏" },
+        { val:"半圓對比",   note:"畫面左右各半圓，強調兩組資料的對稱對比關係" },
+
+        // ── 格狀 / 模組 ──
+        {__cat:"── 格狀 · 模組：適合 F 字型動線 ──", __type:"grid"},
+        { val:"黃金比例",   note:"依黃金矩形分割版面，主視覺置於黃金點，整體最具美感張力" },
+        { val:"雜誌版面",   note:"混合大中小圖文區塊的出版式排版，適合內容豐富的多媒體呈現" },
+        { val:"儀表板格",   note:"多個數值卡片整齊排列，適合 KPI 總覽或系統監控頁面" },
+        { val:"比較表格",   note:"多列多欄的規則表格，適合功能比較或規格清單的平行對照" },
+        { val:"時序面板",   note:"橫向時間軸搭配多列資料面板，適合多事件時序比較" },
+        { val:"列舉清單",   note:"條列式由上到下排列，適合步驟說明或功能特色的簡潔展示" },
+        { val:"雙欄排版",   note:"畫面均分左右兩欄，適合文字說明搭配圖表的圖文並陳版型" },
+        { val:"三欄佈局",   note:"三等分欄位佈局，適合三大重點、三步驟或三方案並列" },
+        { val:"焦點橫幅",   note:"頂部大幅主視覺橫幅搭配下方輔助資訊，適合重點強調型頁面" },
+        { val:"分區方塊",   note:"色塊分區區隔不同資訊群組，適合多主題並存的摘要型頁面" },
+        { val:"卡片瀑布",   note:"卡片由上而下交錯排列形成瀑布流，適合社群牆或成果展示頁" }
+    ];
+
+    const wrapper = document.getElementById('select-layout');
+    const box     = wrapper.querySelector('.select-box');
+    const grid    = wrapper.querySelector('.options-grid');
+    const hidden  = wrapper.querySelector('input[type="hidden"]');
+
+    const catColors = { linear:"#64B5F6", radial:"#FFB74D", stacked:"#BA68C8", organic:"#81C784", circular:"#4DD0E1", grid:"#F06292" };
+
+    layoutData.forEach(d => {
+        if (d.__cat) {
+            const cat = document.createElement('div');
+            cat.className = 'option-cat';
+            cat.textContent = d.__cat;
+            cat.style.color = catColors[d.__type] || 'var(--text-dim)';
+            cat.style.borderColor = (catColors[d.__type] || '#444') + '44';
+            grid.appendChild(cat);
+            return;
+        }
+        const div = document.createElement('div');
+        div.className = 'option-item';
+        div.textContent = d.val;
+        div.dataset.note = d.note;
+        if (d.val === '網格陣列') div.classList.add('selected');
+        div.addEventListener('click', e => {
+            e.stopPropagation();
+            grid.querySelectorAll('.option-item').forEach(x => x.classList.remove('selected'));
+            div.classList.add('selected');
+            box.textContent     = d.val;
+            hidden.value        = d.val;
+            hidden.dataset.note = d.note;
+            grid.classList.remove('show');
+            box.classList.remove('open');
+            onLayoutSelect();
+        });
+        grid.appendChild(div);
+    });
+    box.addEventListener('click', e => {
+        e.stopPropagation();
+        document.querySelectorAll('.options-grid').forEach(g => {
+            if (g !== grid) { g.classList.remove('show'); g.closest('.custom-select').querySelector('.select-box').classList.remove('open'); }
         });
         const isOpen = grid.classList.toggle('show');
         box.classList.toggle('open', isOpen);
@@ -808,7 +1687,8 @@ function updateStylePreview() {
     const adj   = document.getElementById('val-adj').value;
     const color = document.getElementById('val-color').value;
     const noun  = document.getElementById('val-noun').value || '核心';
-    const text  = `3D 擬真${adj}${color}${noun}`;
+    // 正確順序：基底 ＋ 色調 ＋ 形容詞 ＋ 名詞
+    const text  = `3D 擬真${color}${adj}${noun}`;
     document.getElementById('style-preview-text').textContent = text;
 }
 
@@ -890,8 +1770,15 @@ function generateAll() {
     const adj        = document.getElementById('val-adj').value;
     const color      = document.getElementById('val-color').value;
     const noun       = document.getElementById('val-noun').value || '核心';
-    const type       = document.getElementById('val-type').value;
+
+    // 圖表類型（custom-select）
+    const typeSel    = document.getElementById('val-type');
+    const type       = typeSel.value;
+    const flowLayout = typeSel.dataset.flow || 'F字型動線';
+
     const chartStyle = document.getElementById('val-chart-style').value;
+
+    // 畫面佈局（custom-select）
     const layout     = document.getElementById('val-layout').value;
 
     const title      = document.getElementById('report-title').value.trim();
@@ -902,9 +1789,8 @@ function generateAll() {
     const scene      = document.getElementById('report-scene').value;
     const reportType = document.getElementById('report-type').value;
 
-    // 組員格式化：每行 → 雙欄列出
-    const membersRaw   = document.getElementById('report-members').value.trim();
-    const membersList  = membersRaw.split('\n').map(s => s.trim()).filter(Boolean);
+    // 組員格式化：從標籤陣列讀取 → 雙欄列出
+    const membersList  = getMemberTags();
     let membersBlock   = '';
     for (let i = 0; i < membersList.length; i += 2) {
         const left  = membersList[i]   || '';
@@ -917,11 +1803,21 @@ function generateAll() {
     const extraRaw   = document.getElementById('report-extra').value.trim();
     const extraBlock = extraRaw.split('\n').map(l => `    - "${l.trim()}"`).join('\n');
 
-    const chartExtraRaw = document.getElementById('chart-extra').value.trim();
-    const chartExtra    = chartExtraRaw || '（無特殊要求）';
+    const chartExtraRaw = '';
+    const chartExtra    = '（無特殊要求）';
 
-    // 風格名稱
-    const styleName           = `3D 擬真${adj}${color}${noun}`;
+    // 進階選項
+    const extraDraw = document.getElementById('extra-draw').value.trim();
+    const extraBan  = document.getElementById('extra-ban').value.trim();
+    const extraBanBlock = extraBan
+        ? `\n禁止生成項目:\n${extraBan.split('\n').map(l => `  - "${l.trim()}"`).join('\n')}`
+        : '';
+    const extraDrawBlock = extraDraw
+        ? `\n# 額外 AI 繪圖補充指令\n  - "${extraDraw}"`
+        : '';
+
+    // 風格名稱（正確順序：基底 ＋ 色調 ＋ 形容詞 ＋ 名詞）
+    const styleName           = `3D 擬真${color}${adj}${noun}`;
     const colorPrefix         = color || '預設';
     const chartSpecificStyle  = `${colorPrefix}${type}${chartStyle}${layout}`;
 
@@ -1066,10 +1962,26 @@ ${extraBlock}
     意境定義:
       - "【最高指導原則一：絕對 3D 擬真】：強調極致物理真實感，後續所有色彩、PBR 材質以此為先決條件。"
       - "【最高指導原則二：主題物件連動】：圖表視覺特效與數據主圖必須與核心主題直接相關，強制轉化為 3D 立體物件。"
-  模組配置:
-    圖表需求類型: "${type}"
-    圖表視覺風格: "${chartStyle}"
-    畫面佈局:    "${layout}"
+  三層語意模組:
+    Layer1_資訊目的:
+      圖表需求類型: "${type}"
+      圖表視覺風格: "${chartStyle}"
+    Layer2_空間配置:
+      畫面佈局: "${layout}"
+      說明: "描述視覺元素在畫面中的空間排列方式，與動線彼此獨立，不可混用"
+    Layer3_視線引導:
+      視覺動線模式: "${flowLayout}"
+      說明: "描述觀看者目光的移動路徑，由圖表類型的語意結構決定，不受佈局形狀影響"
+
+視覺動線設計規範:
+  動線模式: "${flowLayout}"
+  語意層級: "Layer 3（How）── 獨立於空間佈局，專門描述視線引導邏輯"
+  設計指令:
+    - "觀看者目光依照「${flowLayout}」路徑掃描畫面，所有資訊的視覺重量排列必須符合此動線邏輯"
+    - "主標題、核心數據節點置於動線起點；次要說明文字、來源標註置於動線末端"
+    - "視覺重量最重的 3D 立體物件錨定在動線第一落點，引導視線自然進入畫面"
+    - "對比色與高亮發光效果僅出現在動線關鍵節點，嚴禁分散配置以免打斷視線路徑"
+    - "畫面佈局「${layout}」負責定義元素空間位置，不得覆蓋或干擾動線所定義的視線方向"
 
 色彩與渲染演算:
   圖表風格命名:   "${chartSpecificStyle}"
@@ -1096,7 +2008,7 @@ ${extraBlock}
   材質系統:   "${chartStyle}質感 + PBR 材質貼圖"
   光照系統:   "HDR 環境貼圖 + 動態陰影"
   後製效果:   "景深模糊（Depth of Field）+ 螢幕空間環境遮蔽（SSAO）"
-  解析度基準: "1920 × 1080（支援 4K 向量化輸出）"`;
+  解析度基準: "1920 × 1080（支援 4K 向量化輸出）"${extraBanBlock}${extraDrawBlock}`;
 
     // 寫入 textarea 並更新字數
     setOutput('output-1', yaml1, 'count-1');
@@ -1162,19 +2074,177 @@ function showToast(msg, isErr = false) {
 }
 
 /* ════════════════════════════════════
+   圖表類型選單：更新說明卡
+════════════════════════════════════ */
+function onTypeSelect() {
+    const hidden = document.querySelector('#select-type input[type="hidden"]');
+    if (!hidden) return;
+    document.getElementById('type-info-title').textContent  = hidden.value;
+    document.getElementById('type-flow-badge').textContent  = hidden.dataset.flow     || '';
+    document.getElementById('type-flow-desc').textContent   = hidden.dataset.flowDesc || '';
+}
+
+/* ════════════════════════════════════
+   畫面佈局選單：更新說明卡
+════════════════════════════════════ */
+function onLayoutSelect() {
+    const hidden = document.querySelector('#select-layout input[type="hidden"]');
+    if (!hidden) return;
+    document.getElementById('layout-info-title').textContent = hidden.value;
+    document.getElementById('layout-info-desc').textContent  = hidden.dataset.note || '';
+}
+
+/* ── 簡報類型選單：更新說明卡 ── */
+function onReportTypeSelect() {
+    const sel = document.getElementById('report-type');
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt) return;
+    document.getElementById('rtype-info-title').textContent = opt.value;
+    document.getElementById('rtype-struct').textContent     = opt.dataset.struct || '';
+    document.getElementById('rtype-note').textContent       = opt.dataset.note   || '';
+}
+
+/* ── 額外視覺氛圍強化選單：更新說明卡 ── */
+function onDrawEffectSelect() {
+    const sel  = document.getElementById('extra-draw-sel');
+    const opt  = sel.options[sel.selectedIndex];
+    if (!opt) return;
+
+    const safeVal   = opt.dataset.safe;
+    const desc      = opt.dataset.desc || '';
+    const val       = opt.value;
+    const title     = opt.text.trim();
+
+    // 更新隱藏欄位（供 generateAll 使用）
+    document.getElementById('extra-draw').value = val;
+
+    // 更新說明卡
+    const badge     = document.getElementById('draw-safe-badge');
+    const titleEl   = document.getElementById('draw-effect-title');
+    const descEl    = document.getElementById('draw-effect-desc');
+
+    titleEl.textContent = title;
+    descEl.textContent  = desc;
+
+    if (safeVal === 'true') {
+        // 依說明首字元判斷類型
+        const isOriental = desc.startsWith('🟠');
+        const isDynamic  = desc.startsWith('🟡');
+        if (isOriental) {
+            badge.textContent  = '東方風格';
+            badge.style.cssText= 'background:rgba(255,138,101,0.15);color:#FF8A65;border:1px solid rgba(255,138,101,0.3);font-size:10.5px;font-weight:bold;letter-spacing:0.6px;padding:2px 8px;border-radius:10px;white-space:nowrap;';
+        } else if (isDynamic) {
+            badge.textContent  = '動態強化';
+            badge.style.cssText= 'background:rgba(255,171,0,0.15);color:#FFD740;border:1px solid rgba(255,171,0,0.3);font-size:10.5px;font-weight:bold;letter-spacing:0.6px;padding:2px 8px;border-radius:10px;white-space:nowrap;';
+        } else {
+            badge.textContent  = '靜態強化';
+            badge.style.cssText= 'background:rgba(0,230,118,0.15);color:#69F0AE;border:1px solid rgba(0,230,118,0.3);font-size:10.5px;font-weight:bold;letter-spacing:0.6px;padding:2px 8px;border-radius:10px;white-space:nowrap;';
+        }
+    } else {
+        badge.textContent  = '謹慎使用';
+        badge.style.cssText= 'background:rgba(255,61,0,0.12);color:#FF8A65;border:1px solid rgba(255,61,0,0.3);font-size:10.5px;font-weight:bold;letter-spacing:0.6px;padding:2px 8px;border-radius:10px;white-space:nowrap;';
+    }
+}
+
+/* ════════════════════════════════════
    初始化
 ════════════════════════════════════ */
 initSelect('select-adj',        dataAdj,        '無');
 initSelect('select-color',      dataColor,      '無');
 initSelect('select-noun',       dataNoun,       '核心');
-initSelect('select-type',       dataType,       '數據分析');
 initSelect('select-chart-style',dataChartStyle, '玻璃擬真');
-initSelect('select-layout',     dataLayout,     '網格陣列');
+initTypeSelect();    // 圖表類型（6×5 方塊格）
+initLayoutSelect();  // 畫面佈局（6×5 方塊格）
 
 window.addEventListener('load', () => {
     updateColorPreview();
     updateStylePreview();
+    onTypeSelect();           // 初始化圖表類型說明卡
+    onLayoutSelect();         // 初始化畫面佈局說明卡
+    onReportTypeSelect();     // 初始化簡報類型說明卡
+    onDrawEffectSelect();     // 初始化額外視覺效果說明卡
 });
+/* ════════════════════════════════════
+   進階輸出選項
+════════════════════════════════════ */
+function toggleAdvanced() {
+    const toggle = document.getElementById('adv-toggle');
+    const body   = document.getElementById('adv-body');
+    toggle.classList.toggle('open');
+    body.classList.toggle('open');
+}
+
+/* ════════════════════════════════════
+   成員標籤系統
+════════════════════════════════════ */
+// 初始成員資料
+const _initMembers = [
+    '楊啟正 C11431109', '鍾曉彤 C11431125', '蕭建鳴 C11431105',
+    '蘇萬紘 C11431124', '陳國銘 C11431120', '詹朝元 C11431143'
+];
+
+function getMemberTags() {
+    return Array.from(document.querySelectorAll('.member-tag'))
+        .map(el => el.dataset.val)
+        .filter(Boolean);
+}
+
+function updateMemberCount() {
+    const n = getMemberTags().length;
+    const el = document.getElementById('member-count');
+    if (el) el.textContent = n;
+}
+
+function addMemberTag(val) {
+    val = val.trim();
+    if (!val) return false;
+    const existing = getMemberTags();
+    if (existing.length >= 12) { showToast('最多支援 12 位成員', true); return false; }
+
+    const board = document.getElementById('member-board');
+    const input = document.getElementById('member-input');
+
+    const tag = document.createElement('div');
+    tag.className = 'member-tag';
+    tag.dataset.val = val;
+    tag.innerHTML = `<span>${val}</span><button type="button" class="tag-remove" title="移除" onclick="removeMemberTag(this)">✕</button>`;
+    board.insertBefore(tag, input);
+    updateMemberCount();
+    return true;
+}
+
+function removeMemberTag(btn) {
+    btn.closest('.member-tag').remove();
+    updateMemberCount();
+}
+
+function onMemberKeyDown(e) {
+    const input = e.target;
+    if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        if (addMemberTag(input.value)) input.value = '';
+        autoResizeInput(input);
+    } else if (e.key === 'Backspace' && input.value === '') {
+        // 刪除最後一個標籤
+        const tags = document.querySelectorAll('.member-tag');
+        if (tags.length > 0) tags[tags.length - 1].remove();
+        updateMemberCount();
+    }
+}
+
+function focusMemberInput() {
+    document.getElementById('member-input').focus();
+}
+
+function autoResizeInput(el) {
+    el.style.width = Math.max(100, el.value.length * 9 + 20) + 'px';
+}
+
+// 初始化標籤
+(function initMemberTags() {
+    _initMembers.forEach(m => addMemberTag(m));
+})();
+
 </script>
 </body>
 </html>
