@@ -2591,6 +2591,11 @@ ${subtitleLine}${groupLine}${membersLine}  簡報類型: "${reportType}"
   補充需求:
 ${extraBlock}
 
+封面禁止事項（AI 嚴格執行）:
+  - "簡報類型、受眾設定、風格款式、主題名稱、Report Type、Target、Theme 等所有設定欄位均為 AI 解讀用參數，禁止以標籤（chip/badge/pill/tag）或任何文字形式顯示於投影片封面或任何頁面"
+  - "投影片封面僅允許顯示：主標題、次標題、報告人、成員名單、日期，其餘全部不得出現在畫面"
+  - "違反此規則即視為生成失敗，必須重新生成"
+
 簡報規格設定:
   風格款式: "${specStyle}"
   頁面結構: "${specStyleStruct}"
@@ -2694,6 +2699,11 @@ ${extraBlock}
 ${subtitleLine2}${groupLine2}${membersLine2}    簡報類型: "${reportType}"
     補充需求:
 ${extraBlock}
+
+  首頁視覺禁止事項:
+    - "嚴禁將「簡報類型」、「受眾設定」、「風格名稱」、「主題名稱」、「Report Type」、「Target」、「Theme」等任何設定參數文字以標籤（chip/badge/tag）形式呈現在投影片畫面上"
+    - "以上所有欄位均為 AI 內部設定參數，僅供 AI 解讀使用，不得以任何形式輸出至投影片可見區域"
+    - "投影片封面僅允許顯示：主標題、次標題、報告人、小組成員名單、日期，其餘資訊一律不得出現"
 
   色彩矩陣:
     主背景色:       "#060B1A"
